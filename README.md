@@ -1,6 +1,6 @@
-# Salesforce DX Project: Next Steps
+# CPQ_Express_Mini_Model
 
-Now that you’ve created a Salesforce DX project, what’s next? Here are some documentation resources to get you started.
+This is a Salesforce DX Project for CPQ Express.
 
 ## How Do You Plan to Deploy Your Changes?
 
