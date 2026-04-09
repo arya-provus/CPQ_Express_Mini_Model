@@ -1,0 +1,93 @@
+<template>
+    <div class="dashboard-container">
+        <!-- New Header -->
+        <div class="header-container">
+            <div class="title-group">
+                <div class="title-text">
+                    <h1>Express Home</h1>
+                    <p>Welcome to Provus Express Quoting</p>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <lightning-button label="Refresh" variant="neutral" icon-name="utility:refresh" onclick={handleRefresh} class="pill-button"></lightning-button>
+                <lightning-button label="AI Assistant" variant="neutral" icon-name="utility:magicwand" class="pill-button"></lightning-button>
+            </div>
+        </div>
+
+
+        <!-- Quote Insights Cards -->
+        <h2 class="slds-text-heading_small section-title slds-m-bottom_small">Quote Insights</h2>
+        <lightning-layout multiple-rows="true" class="slds-m-bottom_large">
+            <lightning-layout-item size="4" padding="around-small">
+                <div class="insight-card draft-card">
+                    <div class="insight-icon-wrapper">
+                        <lightning-icon icon-name="utility:edit" size="small"></lightning-icon>
+                    </div>
+                    <div class="insight-content">
+                        <p class="insight-value">{draftCount}</p>
+                        <p class="insight-label">Draft Pipeline</p>
+                        <p class="insight-amount">{draftPipelineFormatted}</p>
+                    </div>
+                </div>
+            </lightning-layout-item>
+            <lightning-layout-item size="4" padding="around-small">
+                <div class="insight-card margin-card">
+                    <div class="insight-icon-wrapper">
+                        <lightning-icon icon-name="utility:trending" size="small"></lightning-icon>
+                    </div>
+                    <div class="insight-content">
+                        <p class="insight-value">{highMarginCount}</p>
+                        <p class="insight-label">High Margin Deals</p>
+                        <p class="insight-sub">&gt; 30% Margin</p>
+                    </div>
+                </div>
+            </lightning-layout-item>
+            <lightning-layout-item size="4" padding="around-small">
+                <div class="insight-card won-card">
+                    <div class="insight-icon-wrapper">
+                        <lightning-icon icon-name="utility:check" size="small"></lightning-icon>
+                    </div>
+                    <div class="insight-content">
+                        <p class="insight-value">{wonCount}</p>
+                        <p class="insight-label">Won This Month</p>
+                        <p class="insight-sub">Approved Quotes</p>
+                    </div>
+                </div>
+            </lightning-layout-item>
+        </lightning-layout>
+
+        <!-- Recent Quotes Activity Feed -->
+        <h2 class="slds-text-heading_small section-title slds-m-bottom_small">Recent Quotes</h2>
+        <div class="recent-quotes-card">
+            <template if:true={hasRecentQuotes}>
+                <template for:each={recentQuotes} for:item="quote">
+                    <div key={quote.Id} class="quote-feed-item" onclick={handleQuoteClick} data-id={quote.Id}>
+                        <div class="feed-icon">
+                            <lightning-icon icon-name="standard:quote" size="small"></lightning-icon>
+                        </div>
+                        <div class="feed-content">
+                            <p class="feed-title">{quote.Name}</p>
+                            <p class="feed-meta">
+                                <span class={quote.statusClass}>{quote.Status}</span>
+                                <template if:true={quote.AccountName}>
+                                    <span class="feed-separator">•</span>
+                                    <span>{quote.AccountName}</span>
+                                </template>
+                            </p>
+                        </div>
+                        <div class="feed-amount">
+                            <p class="feed-amount-value">{quote.formattedAmount}</p>
+                            <p class="feed-date">{quote.formattedDate}</p>
+                        </div>
+                    </div>
+                </template>
+            </template>
+            <template if:false={hasRecentQuotes}>
+                <div class="slds-p-around_large slds-text-align_center">
+                    <p class="slds-text-color_weak">No recent quotes found. Create your first quote to get started!</p>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

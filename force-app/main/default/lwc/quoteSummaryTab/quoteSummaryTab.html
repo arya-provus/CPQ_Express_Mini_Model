@@ -1,0 +1,114 @@
+<template>
+    <div class="summary-container slds-p-top_medium">
+        <!-- Progress Bar Only (Buttons removed as they are now in the Global Header) -->
+        <div class="slds-box slds-theme_default slds-m-bottom_medium approval-header">
+            <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-center">
+                <div class="slds-col slds-size_11-of-12">
+                    <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                        <lightning-progress-step label="Draft" value="1"></lightning-progress-step>
+                        <lightning-progress-step label="In Review" value="2"></lightning-progress-step>
+                        <lightning-progress-step label={stepValue} value="3"></lightning-progress-step>
+                    </lightning-progress-indicator>
+                </div>
+            </div>
+        </div>
+
+        <div class="slds-grid slds-gutters slds-m-bottom_large details-grid">
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-card title="Quote Information" icon-name="standard:quote">
+                    <div class="slds-p-horizontal_small detail-items">
+                        <div class="detail-row">
+                            <span class="detail-label">Opportunity</span>
+                            <span class="detail-value">{opportunityName}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Account</span>
+                            <span class="detail-value">{accountName}</span>
+                        </div>
+                    </div>
+                </lightning-card>
+            </div>
+            
+            <div class="slds-col slds-size_1-of-2">
+                <lightning-card title="System Information" icon-name="standard:info">
+                    <div class="slds-p-horizontal_small detail-items">
+                        <div class="detail-row">
+                            <span class="detail-label">Created By</span>
+                            <span class="detail-value">{createdByName}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Created Date</span>
+                            <span class="detail-value">{formattedCreatedDate}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Expiration Date</span>
+                            <span class="detail-value">{formattedExpirationDate}</span>
+                        </div>
+                    </div>
+                </lightning-card>
+            </div>
+        </div>
+
+        <h2 class="section-title slds-m-bottom_medium">Revenue Breakdown</h2>
+        <div class="slds-grid slds-gutters slds-m-bottom_large cards-grid">
+            <div class="slds-col slds-size_2-of-3">
+                <div class="slds-grid slds-gutters">
+                    <div class="slds-col slds-size_1-of-3">
+                        <div class="revenue-card labor-card">
+                            <div class="card-icon"><lightning-icon icon-name="standard:service_resource" size="medium" variant="inverse"></lightning-icon></div>
+                            <div class="card-info">
+                                <span class="card-title">Labor Revenue</span>
+                                <span class="card-amount"><lightning-formatted-number format-style="currency" currency-code="USD" value={laborRevenue}></lightning-formatted-number></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3">
+                        <div class="revenue-card product-card">
+                            <div class="card-icon"><lightning-icon icon-name="standard:product" size="medium" variant="inverse"></lightning-icon></div>
+                            <div class="card-info">
+                                <span class="card-title">Products Revenue</span>
+                                <span class="card-amount"><lightning-formatted-number format-style="currency" currency-code="USD" value={productRevenue}></lightning-formatted-number></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-col slds-size_1-of-3">
+                        <div class="revenue-card addon-card">
+                            <div class="card-icon"><lightning-icon icon-name="standard:waits" size="medium" variant="inverse"></lightning-icon></div>
+                            <div class="card-info">
+                                <span class="card-title">Add-ons Revenue</span>
+                                <span class="card-amount"><lightning-formatted-number format-style="currency" currency-code="USD" value={addonRevenue}></lightning-formatted-number></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Approval History Panel -->
+            <div class="slds-col slds-size_1-of-3">
+                <lightning-card title="Approval History" icon-name="standard:approval">
+                    <div class="slds-p-horizontal_small approval-history-list">
+                        <template if:true={hasApprovalHistory}>
+                            <template for:each={approvalHistory} for:item="hist">
+                                <div key={hist.Id} class="history-item slds-m-bottom_small">
+                                    <div class="history-header">
+                                        <span class="user-name"><strong>{hist.Action_By__r.Name}</strong></span>
+                                        <span class="action-type slds-m-left_xx-small">{hist.Action__c}</span>
+                                    </div>
+                                    <template if:true={hist.Comments__c}>
+                                        <div class="history-comment slds-m-top_xx-small">{hist.Comments__c}</div>
+                                    </template>
+                                    <div class="history-time slds-text-color_weak slds-m-top_xx-small">
+                                        {hist.relativeTime} • {hist.formattedDate}
+                                    </div>
+                                </div>
+                            </template>
+                        </template>
+                        <template if:false={hasApprovalHistory}>
+                            <p class="slds-text-color_weak slds-p-around_small">No approval actions tracked yet.</p>
+                        </template>
+                    </div>
+                </lightning-card>
+            </div>
+        </div>
+    </div>
+</template>

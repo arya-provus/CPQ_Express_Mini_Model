@@ -1,0 +1,75 @@
+<template>
+    <div class="line-items-container slds-p-top_medium">
+        <div class="slds-grid slds-grid_align-spread slds-m-bottom_medium action-bar">
+            <div class="slds-col">
+                <h2 class="section-title">Line Items</h2>
+            </div>
+            <div class="slds-col action-buttons">
+                <template if:false={isLocked}>
+                    <lightning-button variant="neutral" label="+ Add Phase" class="slds-m-right_x-small"></lightning-button>
+                    <lightning-button variant="brand" label="+ Add Item" onclick={openModal}></lightning-button>
+                </template>
+            </div>
+        </div>
+
+        <div class="datatable-wrapper">
+            <lightning-datatable
+                key-field="Id"
+                data={lineItems}
+                columns={columns}
+                hide-checkbox-column="false"
+                show-row-number-column="true"
+                draft-values={draftValues}
+                onsave={handleInlineSave}
+                onrowaction={handleRowAction}
+                oncellchange={handleCellChange}>
+            </lightning-datatable>
+            <template if:true={lineItems}>
+                <template if:false={lineItems.length}>
+                    <div class="slds-p-around_medium slds-text-align_center empty-state">
+                        <p>No line items found. Click "Add Line Items" to get started.</p>
+                    </div>
+                </template>
+            </template>
+        </div>
+
+        <!-- Add Line Items Modal -->
+        <template if:true={isModalOpen}>
+            <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_large" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1">
+                <div class="slds-modal__container" style="max-height: 90vh;">
+                    <header class="slds-modal__header slds-p-around_medium custom-modal-header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small"></lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-modal__title slds-hyphenate">Add Catalog Items</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium add-modal-content" id="modal-content-id-1">
+                        <div class="slds-grid slds-gutters slds-m-bottom_medium">
+                            <div class="slds-col slds-size_1-of-3">
+                                <lightning-input type="search" placeholder="Search by Phase, Role, Skill" variant="label-hidden"></lightning-input>
+                            </div>
+                        </div>
+                        
+                        <lightning-tabset class="add-modal-tabs" active-tab-value={activeTabName}>
+                            <lightning-tab label="Resource Roles" value="roles" onactive={handleTabActive}>
+                                <c-resource-role-manager is-modal-mode="true"></c-resource-role-manager>
+                            </lightning-tab>
+                            <lightning-tab label="Products" value="products" onactive={handleTabActive}>
+                                <c-product-manager is-modal-mode="true"></c-product-manager>
+                            </lightning-tab>
+                            <lightning-tab label="Add-ons" value="addons" onactive={handleTabActive}>
+                                <c-add-on-manager is-modal-mode="true"></c-add-on-manager>
+                            </lightning-tab>
+                        </lightning-tabset>
+                    </div>
+                    <footer class="slds-modal__footer custom-modal-footer">
+                        <button class="slds-button slds-button_neutral" onclick={closeModal}>Cancel</button>
+                        <button class="slds-button slds-button_brand slds-m-left_x-small" onclick={handleAddSelected}>Add to Quote</button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </div>
+</template>

@@ -1,0 +1,104 @@
+<template>
+    <div class="detail-view-container">
+        <!-- Spinner -->
+        <template if:true={isLoading}>
+            <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
+        </template>
+
+        <!-- Main Content -->
+        <template if:false={isLoading}>
+            <template if:true={quote}>
+                <!-- Header -->
+                <div class="header-section">
+                    <div class="header-top">
+                        <div class="title-area">
+                            <lightning-button-icon icon-name="utility:back" variant="bare" size="large" alternative-text="Back" class="back-button" onclick={handleBack}></lightning-button-icon>
+                            <h1 class="quote-title">{quoteNumber}</h1>
+                            <span class={statusBadgeClass}>{statusLabel}</span>
+                            <template if:true={isLocked}>
+                                <lightning-icon icon-name="utility:lock" size="x-small" title="Quote is locked" class="lock-icon-header"></lightning-icon>
+                            </template>
+                        </div>
+                        <div class="action-buttons">
+                            <template if:true={canSubmit}>
+                                <button class="btn-outline" onclick={handleSubmitForApproval}>Submit for Approval</button>
+                            </template>
+                            <template if:true={canRecall}>
+                                <button class="btn-outline" onclick={handleRecall}>Recall</button>
+                            </template>
+                            <template if:true={canApprove}>
+                                <button class="btn-success" onclick={handleApprove}>Approve</button>
+                            </template>
+                            <template if:true={canReject}>
+                                <button class="btn-danger" onclick={handleReject}>Reject</button>
+                            </template>
+                            <button class="btn-primary" onclick={handleGeneratePDF}>Generate PDF</button>
+                            <button class="btn-primary slds-m-left_x-small" onclick={handleGlobalSave}>Save</button>
+                            <button class="btn-outline slds-m-left_x-small" onclick={handleGlobalRefresh}>Refresh</button>
+                        </div>
+                    </div>
+                    
+                    <div class="totals-ribbon">
+                        <div class="total-item">
+                            <span class="total-label">Total Amount</span>
+                            <span class="total-value"><lightning-formatted-number format-style="currency" currency-code="USD" value={totalAmount}></lightning-formatted-number></span>
+                        </div>
+                        <div class="total-item">
+                            <span class="total-label">Subtotal</span>
+                            <span class="total-value"><lightning-formatted-number format-style="currency" currency-code="USD" value={subtotal}></lightning-formatted-number></span>
+                        </div>
+                        <div class="total-item">
+                            <span class="total-label">Margin %</span>
+                            <span class="total-value">{margin}%</span>
+                        </div>
+                        <div class="total-item">
+                            <span class="total-label">Discount %</span>
+                            <span class="total-value">{discount}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs Area -->
+                <div class="tabs-section">
+                    <lightning-tabset onactive={handleTabActive}>
+                        <lightning-tab label="Summary" value="summary">
+                            <c-quote-summary-tab
+                                quote-record={quote}
+                                onquoteupdate={handleQuoteUpdate}>
+                            </c-quote-summary-tab>
+                        </lightning-tab>
+                        <lightning-tab label="Line Items" value="lineItems">
+                            <c-quote-line-items-tab 
+                                quote-id={quoteId}
+                                is-locked={isLocked}
+                                onlineschanged={handleLinesChanged}
+                                ontotalsupdate={handleTotalsUpdate}>
+                            </c-quote-line-items-tab>
+                        </lightning-tab>
+                        <lightning-tab label="Timeline" value="timeline">
+                            <c-quote-timeline-tab quote-id={quoteId}></c-quote-timeline-tab>
+                        </lightning-tab>
+                        <lightning-tab label="Generated PDFs" value="pdfs">
+                            <c-quote-pdfs-tab quote-id={quoteId}></c-quote-pdfs-tab>
+                        </lightning-tab>
+                    </lightning-tabset>
+                </div>
+            </template>
+            <template if:true={error}>
+                <div class="slds-p-around_medium">
+                    <p class="slds-text-color_error">Error loading quote.</p>
+                </div>
+            </template>
+        </template>
+    </div>
+
+    <!-- Centralized Approval Modal -->
+    <c-quote-action-modal
+        is-open={isModalOpen}
+        title={modalTitle}
+        confirm-label={modalConfirmLabel}
+        confirm-variant={modalConfirmVariant}
+        oncancel={handleModalCancel}
+        onconfirm={handleModalConfirm}
+    ></c-quote-action-modal>
+</template>

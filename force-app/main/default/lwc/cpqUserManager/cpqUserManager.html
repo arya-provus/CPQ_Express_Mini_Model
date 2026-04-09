@@ -1,0 +1,151 @@
+<template>
+    <div class="user-manager-container">
+        <!-- Header -->
+        <div class="manager-header">
+            <div class="header-text">
+                <lightning-icon icon-name="utility:people" size="x-small" class="slds-m-right_xx-small" variant="bare"></lightning-icon>
+                <h2>Manage Your Team</h2>
+                <p class="subtitle">Manage user access, roles, and permissions.</p>
+            </div>
+            <template if:true={canManage}>
+                <button class="btn-primary" onclick={openPanel}>+ Team Member</button>
+            </template>
+        </div>
+
+        <!-- Stats Card -->
+        <div class="stats-card">
+            <div class="stat-col">
+                <h3>{totalSeats}</h3>
+                <p>TOTAL SEATS</p>
+            </div>
+            <div class="stat-col">
+                <h3>{usedSeats}</h3>
+                <p>USED SEATS</p>
+            </div>
+            <div class="stat-col">
+                <h3>{availableSeats}</h3>
+                <p>AVAILABLE</p>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="table-container">
+            <table class="users-table">
+                <thead>
+                    <tr>
+                        <th class="chk-col"><input type="checkbox"/></th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Status</th>
+                        <th>Last Active</th>
+                        <template if:true={canManage}>
+                            <th></th>
+                        </template>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={usersView} for:item="user">
+                        <tr key={user.id}>
+                            <td class="chk-col"><input type="checkbox"/></td>
+                            <td>
+                                <div class="user-name-cell">
+                                    <div class={user.avatarClass}>{user.initials}</div>
+                                    <span class="user-name">{user.name}</span>
+                                </div>
+                            </td>
+                            <td class="user-email">{user.email}</td>
+                            <td>
+                                <span class={user.roleClass}>{user.role}</span>
+                            </td>
+                            <td>
+                                <div class="status-cell">
+                                    <span class={user.statusDotClass}></span>
+                                    <span>{user.statusText}</span>
+                                </div>
+                            </td>
+                            <td class="user-date">{user.lastActiveFormatted}</td>
+                            <template if:true={canManage}>
+                                <td class="action-cell">
+                                    <lightning-button-menu alternative-text="Show menu" icon-size="x-small" menu-alignment="right">
+                                        <lightning-menu-item value="edit" label="Edit" icon-name="utility:edit"></lightning-menu-item>
+                                        <lightning-menu-item value="remove" label="Remove Access" icon-name="utility:hide" onclick={handleRemoveAccess} data-id={user.id}></lightning-menu-item>
+                                        <lightning-menu-item value="deactivate" label="Deactivate" icon-name="utility:block_visitor" class="menu-danger" onclick={handleDeactivate} data-id={user.id}></lightning-menu-item>
+                                    </lightning-button-menu>
+                                </td>
+                            </template>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Slide-out Panel Overlay -->
+        <template if:true={isPanelOpen}>
+            <div class="panel-overlay" onclick={closePanel}></div>
+            <div class="slide-panel">
+                <div class="panel-header">
+                    <h2>Create Team Member</h2>
+                    <p>Add a team member and select a role before submitting.</p>
+                </div>
+                
+                <div class="panel-body">
+                    <!-- Form Fields -->
+                    <div class="form-group">
+                        <label>First Name <span class="required">*</span></label>
+                        <input type="text" class="custom-input" placeholder="Enter first name" value={form.firstName} onchange={handleInputChange} data-field="firstName"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name <span class="required">*</span></label>
+                        <input type="text" class="custom-input" placeholder="Enter last name" value={form.lastName} onchange={handleInputChange} data-field="lastName"/>
+                    </div>
+                    <div class="form-group">
+                        <label>Email <span class="required">*</span></label>
+                        <input type="email" class="custom-input" placeholder="Enter email address" value={form.email} onchange={handleInputChange} data-field="email"/>
+                        <p class="field-help">Email will also be used as the default username.</p>
+                    </div>
+                    <div class="form-group">
+                        <label>Username <span class="required">*</span></label>
+                        <input type="text" class="custom-input" placeholder="Enter username (email format)" value={form.username} onchange={handleInputChange} data-field="username"/>
+                        <p class="field-help">Must be in email format and be unique.</p>
+                    </div>
+
+                    <!-- Roles -->
+                    <div class="form-group">
+                        <label>Role <span class="required">*</span></label>
+                        <p class="field-help slds-m-bottom_small">Choose a role to control access and responsibilities.</p>
+                        
+                        <div class={adminCardClass} onclick={selectRole} data-role="Admin">
+                            <input type="radio" name="role" checked={isAdmin} read-only/>
+                            <div class="role-info">
+                                <strong>Admin</strong>
+                                <p>Full settings access and all Manager/User capabilities.</p>
+                            </div>
+                        </div>
+
+                        <div class={managerCardClass} onclick={selectRole} data-role="Manager">
+                            <input type="radio" name="role" checked={isManager} read-only/>
+                            <div class="role-info">
+                                <strong>Manager</strong>
+                                <p>Can approve/reject quotes and manage team data.</p>
+                            </div>
+                        </div>
+
+                        <div class={userCardClass} onclick={selectRole} data-role="User">
+                            <input type="radio" name="role" checked={isUserRole} read-only/>
+                            <div class="role-info">
+                                <strong>User</strong>
+                                <p>Can edit own quotes, view others read-only, and manage catalog data.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-footer">
+                    <button class="btn-cancel" onclick={closePanel}>Cancel</button>
+                    <button class="btn-primary" onclick={handleCreateUser}>Create</button>
+                </div>
+            </div>
+        </template>
+    </div>
+</template>

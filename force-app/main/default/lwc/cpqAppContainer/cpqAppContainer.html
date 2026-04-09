@@ -1,0 +1,36 @@
+<template>
+    <div class="app-background">
+        <lightning-layout pull-to-boundary="small">
+            <!-- Sidebar Column -->
+            <lightning-layout-item size="2" class="sidebar-wrapper slds-p-right_none">
+                <c-cpq-sidebar active-item={currentPage} onnavselect={handleNavigation}></c-cpq-sidebar>
+            </lightning-layout-item>
+
+            <!-- Main Content Column -->
+            <lightning-layout-item size="10" class="content-wrapper slds-p-left_none">
+                <template if:true={isDashboard}>
+                    <c-cpq-dashboard onviewquote={handleViewQuote}></c-cpq-dashboard>
+                </template>
+                <template if:true={isQuotes}>
+                    <c-quote-manager onviewquote={handleViewQuote}></c-quote-manager>
+                </template>
+                <template if:true={isQuoteDetails}>
+                    <c-quote-detail-viewer quote-id={currentQuoteId} onback={handleBackToQuotes}></c-quote-detail-viewer>
+                </template>
+                <template if:true={isProducts}>
+                    <c-product-manager></c-product-manager>
+                </template>
+                <template if:true={isAddons}>
+                    <c-add-on-manager></c-add-on-manager>
+                </template>
+                <template if:true={isResourceRoles}>
+                    <c-resource-role-manager></c-resource-role-manager>
+                </template>
+                <template if:true={isSettings}>
+                    <c-cpq-settings onnavselect={handleNavigation}></c-cpq-settings>
+                </template>
+                <!-- Add other templates as needed -->
+            </lightning-layout-item>
+        </lightning-layout>
+    </div>
+</template>

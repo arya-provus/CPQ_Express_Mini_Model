@@ -1,0 +1,161 @@
+.container {
+    background-color: #f9fafb;
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+
+/* Floating Selection Bar */
+.selection-bar-container {
+    position: fixed;
+    bottom: 2rem;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    z-index: 999;
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.selection-bar {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(229, 231, 235, 0.5);
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+
+.selection-count {
+    border-right: 1px solid #e5e7eb;
+    padding-right: 1.5rem;
+}
+
+.count-pill {
+    background: #f3f4f6;
+    color: #374151;
+    font-weight: 600;
+    font-size: 0.875rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+}
+
+.selection-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.clear-btn {
+    --slds-c-button-text-color: #6b7280;
+    font-weight: 500;
+}
+
+.clear-btn:hover {
+    color: #111827;
+}
+
+.bulk-delete-btn {
+    --slds-c-button-border-radius: 20px;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Header Section */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.title-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.back-button {
+    cursor: pointer;
+    color: #4b5563;
+}
+
+.title-text h1 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.title-text p {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.pill-button {
+    --slds-c-button-border-radius: 20px;
+    font-weight: 500;
+}
+
+/* Search and Filter Section */
+.search-filter-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.search-wrapper {
+    flex: 1;
+    max-width: 400px;
+}
+
+.filter-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.filter-pill {
+    --slds-c-button-border-radius: 20px;
+    --slds-c-button-text-color: #4b5563;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+}
+
+/* Table Card */
+.card-container {
+    background: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.info-text {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+/* Datatable customizations (light headers) */
+.custom-table {
+    --slds-c-datatable-header-background-color: #f9fafb;
+    --slds-c-datatable-header-text-color: #4b5563;
+}

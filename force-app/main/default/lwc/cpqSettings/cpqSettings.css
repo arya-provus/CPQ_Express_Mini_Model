@@ -1,0 +1,198 @@
+:host {
+    display: block;
+    height: 100%;
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    overflow-y: auto;
+}
+
+/* Header */
+.settings-header {
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.header-title {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    color: #1a1a1a;
+}
+
+.header-title h2 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.subtitle {
+    margin: 4px 0 0 24px;
+    color: #666;
+    font-size: 13px;
+}
+
+/* Body Layout */
+.settings-body {
+    display: flex;
+    gap: 32px;
+}
+
+/* Left Sidebar */
+.settings-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+}
+
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 16px;
+    margin-bottom: 4px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #444;
+    transition: all 0.2s ease;
+}
+
+.nav-item:hover {
+    background-color: #f5f5f5;
+}
+
+.nav-item.active {
+    background-color: #f0f4ff;
+    color: #1967d2;
+    font-weight: 500;
+}
+
+.nav-item .nav-icon {
+    margin-right: 12px;
+    --sds-c-icon-color-foreground-default: #666;
+}
+
+.nav-item.active .nav-icon {
+    --sds-c-icon-color-foreground-default: #1967d2;
+}
+
+/* Main Content Area */
+.settings-content {
+    flex-grow: 1;
+    max-width: 800px;
+}
+
+/* Settings View Container */
+.section-container {
+    padding: 8px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.section-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.section-subtitle {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 24px;
+}
+
+/* Billing Table */
+.billing-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 32px;
+}
+
+.billing-table th {
+    text-align: left;
+    padding: 12px 16px;
+    color: #333;
+    font-weight: 600;
+    font-size: 13px;
+    border-bottom: 1px solid #eaeaea;
+}
+
+.billing-table td {
+    padding: 16px;
+    font-size: 13px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.text-blue {
+    color: #1967d2;
+}
+
+/* Example Card */
+.example-card {
+    background-color: #f8fafe;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e1e9ff;
+}
+
+.example-title {
+    color: #1967d2;
+    font-weight: 500;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.example-name {
+    color: #333;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.example-desc {
+    color: #1967d2;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+
+.example-grid {
+    display: flex;
+    justify-content: flex-start;
+    gap: 80px;
+}
+
+.example-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.example-col-title {
+    font-weight: 500;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.example-col p {
+    font-size: 13px;
+    color: #333;
+    margin: 0;
+}
+
+.placeholder-view {
+    color: #666;
+    font-style: italic;
+    padding-top: 24px;
+}

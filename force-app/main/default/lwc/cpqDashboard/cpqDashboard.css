@@ -1,0 +1,226 @@
+.dashboard-container {
+    background-color: #f9fafb;
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+
+/* Header Section */
+.header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.title-group {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.title-text h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+}
+
+.title-text p {
+    font-size: 0.95rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.pill-button {
+    --slds-c-button-border-radius: 20px;
+    font-weight: 500;
+}
+
+.welcome-section {
+    background: linear-gradient(135deg, #1b2a4a 0%, #0070d2 100%);
+    border-radius: 12px;
+    padding: 2rem 2.5rem;
+    color: white;
+}
+
+.welcome-title {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.welcome-subtitle {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.95rem;
+}
+
+.section-title {
+    font-weight: 600;
+    color: #1b2a4a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.8rem;
+}
+
+/* Insight Cards */
+.insight-card {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    border-left: 4px solid transparent;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+.insight-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.draft-card { border-left-color: #ff9800; }
+.margin-card { border-left-color: #0070d2; }
+.won-card { border-left-color: #4caf50; }
+
+.insight-icon-wrapper {
+    background: #f0f4f8;
+    border-radius: 8px;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.insight-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1b2a4a;
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.insight-label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #4a5568;
+    margin-bottom: 0.125rem;
+}
+
+.insight-amount,
+.insight-sub {
+    font-size: 0.75rem;
+    color: #718096;
+}
+
+/* Recent Quotes Feed */
+.recent-quotes-card {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.quote-feed-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f0f2f5;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    gap: 1rem;
+}
+
+.quote-feed-item:hover {
+    background-color: #f8fafc;
+}
+
+.quote-feed-item:last-child {
+    border-bottom: none;
+}
+
+.feed-icon {
+    flex-shrink: 0;
+}
+
+.feed-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.feed-title {
+    font-weight: 600;
+    color: #1b2a4a;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.feed-meta {
+    font-size: 0.8rem;
+    color: #718096;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.125rem;
+}
+
+.feed-separator {
+    color: #cbd5e0;
+}
+
+.feed-amount {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.feed-amount-value {
+    font-weight: 700;
+    color: #1b2a4a;
+    font-size: 0.9rem;
+}
+
+.feed-date {
+    font-size: 0.75rem;
+    color: #a0aec0;
+}
+
+/* Status Badges */
+.status-badge {
+    display: inline-block;
+    padding: 0.125rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.status-draft {
+    background-color: #fff3e0;
+    color: #e65100;
+}
+
+.status-approved {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.status-rejected {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.status-review {
+    background-color: #e3f2fd;
+    color: #1565c0;
+}

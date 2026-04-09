@@ -1,0 +1,160 @@
+<template>
+    <div class="container">
+        <!-- Custom Header -->
+        <div class="header-container">
+            <div class="title-group">
+                <div class="back-button">
+                    <lightning-icon icon-name="utility:chevronleft" size="small"></lightning-icon>
+                </div>
+                <div class="title-text">
+                    <h1>Quotes</h1>
+                    <p>Manage sales quotes and proposals</p>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <lightning-button label="New" variant="brand" icon-name="utility:add" onclick={openModal} class="pill-button"></lightning-button>
+                <lightning-button label="Refresh" variant="neutral" icon-name="utility:refresh" onclick={handleRefresh} class="pill-button"></lightning-button>
+                <lightning-button label="AI Assistant" variant="neutral" icon-name="utility:magicwand" class="pill-button"></lightning-button>
+            </div>
+        </div>
+
+        <!-- Search and Filter Bar -->
+        <div class="search-filter-container">
+            <div class="search-wrapper">
+                <lightning-input
+                    type="search"
+                    variant="label-hidden"
+                    placeholder="Search quotes..."
+                    value={searchKey}
+                    onchange={handleSearchChange}
+                ></lightning-input>
+            </div>
+            
+            <div class="filter-group">
+                <lightning-button-icon icon-name="utility:filterList" variant="border-filled" class="pill-button"></lightning-button-icon>
+                <lightning-button-menu label={statusFilter} variant="neutral" onselect={handleStatusSelect} class="filter-pill">
+                    <lightning-menu-item value="All Status" label="All Status"></lightning-menu-item>
+                    <lightning-menu-item value="Draft" label="Draft"></lightning-menu-item>
+                    <lightning-menu-item value="Pending Approval" label="Pending Approval"></lightning-menu-item>
+                    <lightning-menu-item value="Approved" label="Approved"></lightning-menu-item>
+                    <lightning-menu-item value="Rejected" label="Rejected"></lightning-menu-item>
+                </lightning-button-menu>
+                <lightning-button-menu label={accountFilter} variant="neutral" onselect={handleAccountSelect} class="filter-pill">
+                    <template for:each={accountOptions} for:item="option">
+                        <lightning-menu-item key={option.value} value={option.value} label={option.label}></lightning-menu-item>
+                    </template>
+                </lightning-button-menu>
+                <lightning-button label="View" variant="neutral" icon-name="utility:table" class="filter-pill"></lightning-button>
+                <lightning-badge label={quoteCount}></lightning-badge>
+            </div>
+        </div>
+
+        <p class="info-text">Showing 1-{quoteCount} of {totalQuoteCount}</p>
+
+        <!-- Quote Table -->
+        <div class="card-container">
+            <lightning-datatable
+                key-field="Id"
+                data={formattedQuotes}
+                columns={columns}
+                onrowaction={handleRowAction}
+                onrowselection={handleRowSelection}
+                class="custom-table"
+            ></lightning-datatable>
+        </div>
+
+        <!-- Floating Selection Bar -->
+        <template if:true={isSelectionActive}>
+            <div class="selection-bar-container">
+                <div class="selection-bar">
+                    <div class="selection-count">
+                        <span class="count-pill">{selectedCount} selected</span>
+                    </div>
+                    <div class="selection-actions">
+                        <lightning-button label="Clear" variant="bare" onclick={handleClearSelection} class="clear-btn"></lightning-button>
+                        <lightning-button label="Delete" variant="destructive" icon-name="utility:delete" onclick={handleBulkDelete} class="bulk-delete-btn"></lightning-button>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Premium Confirmation Modal -->
+        <c-cpq-confirmation-modal
+            is-open={isConfirmOpen}
+            title={confirmTitle}
+            message={confirmMessage}
+            onconfirm={executeDelete}
+            oncancel={closeConfirm}
+        ></c-cpq-confirmation-modal>
+
+        <!-- Create New Quote Modal -->
+        <template if:true={isModalOpen}>
+            <section role="dialog" tabindex="-1" aria-labelledby="quote-modal-heading" aria-modal="true" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal Header -->
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small"></lightning-icon>
+                        </button>
+                        <h2 id="quote-modal-heading" class="slds-text-heading_medium slds-hyphenate">Create New Quote</h2>
+                    </header>
+                    <!-- Modal Body -->
+                    <div class="slds-modal__content slds-p-around_medium" id="quote-modal-content">
+                        <div class="slds-grid slds-wrap slds-gutters">
+                            <div class="slds-col slds-size_1-of-1 slds-p-bottom_small">
+                                <lightning-record-picker
+                                    label="Opportunity"
+                                    placeholder="Select an opportunity (optional)..."
+                                    object-api-name="Opportunity"
+                                    onchange={handleOpportunityChange}
+                                ></lightning-record-picker>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-p-bottom_small">
+                                <lightning-record-picker
+                                    label="Account"
+                                    placeholder="Select an account..."
+                                    object-api-name="Account"
+                                    required
+                                    onchange={handleAccountChange}
+                                ></lightning-record-picker>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-p-bottom_small">
+                                <lightning-textarea
+                                    label="Description"
+                                    placeholder="Enter quote description (optional)..."
+                                    value={quoteFields.Description}
+                                    data-field="Description"
+                                    onchange={handleFieldChange}
+                                    max-length="255"
+                                ></lightning-textarea>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-p-bottom_small">
+                                <lightning-input type="date" label="Quote Start Date" value={quoteFields.StartDate} data-field="StartDate" onchange={handleFieldChange} required></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-p-bottom_small">
+                                <lightning-input type="date" label="Quote End Date" value={quoteFields.EndDate} data-field="EndDate" onchange={handleFieldChange}></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-p-bottom_small">
+                                <lightning-combobox
+                                    label="Time Period"
+                                    options={timePeriodOptions}
+                                    value={quoteFields.TimePeriod}
+                                    data-field="TimePeriod"
+                                    onchange={handleFieldChange}
+                                    required
+                                ></lightning-combobox>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal Footer -->
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Cancel" onclick={closeModal} class="slds-m-right_x-small"></lightning-button>
+                        <lightning-button label="Create Quote" variant="brand" onclick={handleCreateQuote} disabled={isCreateDisabled}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </div>
+</template>

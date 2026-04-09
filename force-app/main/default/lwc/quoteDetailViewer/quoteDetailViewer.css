@@ -1,0 +1,178 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
+.detail-view-container {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.header-section {
+    padding: 24px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.title-area {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.back-button {
+    cursor: pointer;
+}
+
+.quote-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+/* ── Status Pills ────────────────────────────────────────────────── */
+
+.status-pill-draft {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.status-pill-review {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-pill-approved {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-pill-rejected {
+    background: #fee2e2;
+    color: #ef4444;
+}
+
+.lock-icon-header {
+    --slds-c-icon-color-foreground: #92400e;
+}
+
+/* ── Action Buttons ──────────────────────────────────────────────── */
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-outline {
+    background: white;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-outline:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+
+.btn-primary {
+    background: #2563eb;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background: #1d4ed8;
+}
+
+.btn-success {
+    background: #10b981;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-success:hover {
+    background: #059669;
+}
+
+.btn-danger {
+    background: #ef4444;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-danger:hover {
+    background: #dc2626;
+}
+
+/* ── Totals Ribbon ───────────────────────────────────────────────── */
+
+.totals-ribbon {
+    display: flex;
+    gap: 32px;
+    background: #f8fafc;
+    padding: 16px 24px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.total-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.total-label {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+}
+
+.total-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.tabs-section {
+    flex-grow: 1;
+    padding: 0 24px;
+    margin-top: 16px;
+}
+
+/* Lightning Tabset internal styling overrides */
+.tabs-section lightning-tabset {
+    --slds-c-tabs-nav-color-background: transparent;
+    --slds-c-tabs-nav-item-spacing-horizontal: 1.5rem;
+}

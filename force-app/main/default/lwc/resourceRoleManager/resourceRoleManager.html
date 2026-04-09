@@ -1,0 +1,174 @@
+<template>
+    <div class="container">
+        <!-- Custom Header -->
+        <template if:false={isModalMode}>
+            <div class="header-container">
+                <div class="title-group">
+                    <div class="back-button">
+                        <lightning-icon icon-name="utility:chevronleft" size="small"></lightning-icon>
+                    </div>
+                    <div class="title-text">
+                        <h1>Resource Roles</h1>
+                        <p>Manage resource roles and base rates</p>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <template if:true={canManageCatalog}>
+                        <lightning-button label="New" variant="brand" icon-name="utility:add" onclick={openModal} class="pill-button"></lightning-button>
+                        <lightning-button label="Import" variant="neutral" icon-name="utility:upload" class="pill-button"></lightning-button>
+                    </template>
+                    <lightning-button label="Refresh" variant="neutral" icon-name="utility:refresh" onclick={handleRefresh} class="pill-button"></lightning-button>
+                    <lightning-button label="AI Assistant" variant="neutral" icon-name="utility:magicwand" class="pill-button"></lightning-button>
+                </div>
+            </div>
+        </template>
+
+        <!-- Search and Filter Bar -->
+        <div class="search-filter-container">
+            <div class="search-wrapper">
+                <lightning-input
+                    type="search"
+                    variant="label-hidden"
+                    placeholder="Search Resource Roles by name or location..."
+                    value={searchKey}
+                    onchange={handleSearchChange}
+                ></lightning-input>
+            </div>
+            
+            <div class="filter-group" style="position: relative;">
+                <lightning-button-menu label={statusFilter} variant="neutral" onselect={handleStatusSelect} class="filter-pill">
+                    <lightning-menu-item value="All Status" label="All Status"></lightning-menu-item>
+                    <lightning-menu-item value="Active" label="Active"></lightning-menu-item>
+                    <lightning-menu-item value="Inactive" label="Inactive"></lightning-menu-item>
+                </lightning-button-menu>
+                <lightning-button label="Filters" variant="neutral" icon-name="utility:filterList" onclick={toggleFilterPopover} class="filter-pill"></lightning-button>
+                <lightning-button label="View" variant="neutral" icon-name="utility:table" class="filter-pill"></lightning-button>
+                <lightning-badge label={roleCount}></lightning-badge>
+
+                <!-- Custom Filter Popover -->
+                <template if:true={isFilterOpen}>
+                    <section class="slds-popover slds-nubbin_top-right slds-popover_prompt" role="dialog" style="position:absolute; top:40px; right: 80px; z-index: 100;">
+                        <div class="slds-popover__body slds-p-around_medium">
+                            <div class="slds-grid slds-wrap slds-gutters">
+                                <div class="slds-col slds-size_1-of-2 slds-p-bottom_small">
+                                    <lightning-combobox label="Status" value={popoverFilters.status} options={statusOptions} data-filter="status" onchange={handlePopoverFilterChange}></lightning-combobox>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2 slds-p-bottom_small">
+                                    <lightning-combobox label="Usage" value={popoverFilters.usage} options={usageOptions} data-filter="usage" onchange={handlePopoverFilterChange}></lightning-combobox>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1 slds-p-bottom_small">
+                                    <lightning-combobox label="Billing Unit" value={popoverFilters.billingUnit} options={billingOptions} data-filter="billingUnit" onchange={handlePopoverFilterChange}></lightning-combobox>
+                                </div>
+                                <div class="slds-col slds-size_1-of-1">
+                                    <label class="slds-form-element__label">Price Range</label>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input type="number" placeholder="Min Price" value={popoverFilters.minPrice} data-filter="minPrice" onchange={handlePopoverFilterChange} variant="label-hidden"></lightning-input>
+                                </div>
+                                <div class="slds-col slds-size_1-of-2">
+                                    <lightning-input type="number" placeholder="Max Price" value={popoverFilters.maxPrice} data-filter="maxPrice" onchange={handlePopoverFilterChange} variant="label-hidden"></lightning-input>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </template>
+            </div>
+        </div>
+
+        <p class="info-text">Showing 1-{roleCount} of {roleCount}</p>
+
+        <!-- Roles Table -->
+        <div class="card-container">
+            <lightning-datatable
+                key-field="Id"
+                data={formattedRoles}
+                columns={columns}
+                class="custom-table"
+                onrowaction={handleRowAction}
+                onrowselection={handleRowSelection}
+                hide-checkbox-column={hideCheckboxColumn}
+            ></lightning-datatable>
+        </div>
+
+        <!-- Bulk Deletion UI (Hidden in Modal Mode) -->
+        <template if:false={isModalMode}>
+            <template if:true={canManageCatalog}>
+                <!-- Floating Selection Bar -->
+                <template if:true={isSelectionActive}>
+                    <div class="selection-bar-container">
+                        <div class="selection-bar">
+                            <div class="selection-count">
+                                <span class="count-pill">{selectedCount} selected</span>
+                            </div>
+                            <div class="selection-actions">
+                                <lightning-button label="Clear" variant="bare" onclick={handleClearSelection} class="clear-btn"></lightning-button>
+                                <lightning-button label="Delete" variant="destructive" icon-name="utility:delete" onclick={handleBulkDelete} class="bulk-delete-btn"></lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </template>
+
+            <!-- Premium Confirmation Modal -->
+            <c-cpq-confirmation-modal
+                is-open={isConfirmOpen}
+                title={confirmTitle}
+                message={confirmMessage}
+                onconfirm={executeDelete}
+                oncancel={closeConfirm}
+            ></c-cpq-confirmation-modal>
+        </template>
+
+
+        <!-- Create Modal -->
+        <template if:true={isModalOpen}>
+            <section role="dialog" tabindex="-1" aria-labelledby="role-modal-heading" aria-modal="true" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small"></lightning-icon>
+                        </button>
+                        <h2 id="role-modal-heading" class="slds-text-heading_medium slds-hyphenate">{modalTitle}</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <div class="slds-grid slds-wrap slds-gutters">
+                            <div class="slds-col slds-size_1-of-1 slds-p-bottom_small">
+                                <lightning-input label="Name" value={roleFields.Name} data-field="Name" placeholder="e.g., Senior Software Engineer" onchange={handleFieldChange} required></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-p-bottom_small">
+                                <lightning-textarea label="Description" placeholder="Provide details about this role, such as responsibilities, skill set, and experience." value={roleFields.Description} data-field="Description" onchange={handleFieldChange} max-length="255"></lightning-textarea>
+                            </div>
+                            <div class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                                <lightning-input type="number" step="0.01" label="Price" value={roleFields.BaseRate} data-field="BaseRate" onchange={handleFieldChange} required></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                                <lightning-input type="number" step="0.01" label="Cost" value={roleFields.Cost} data-field="Cost" onchange={handleFieldChange}></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                                <lightning-combobox label="Billing Unit" value={roleFields.BillingUnit} options={billingOptions} data-field="BillingUnit" onchange={handleFieldChange} required></lightning-combobox>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1">
+                                <p class="slds-form-element__label slds-m-top_small">Location</p>
+                            </div>
+                            <div class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                                <lightning-input label="City" value={roleFields.City} data-field="City" placeholder="San Francisco" onchange={handleFieldChange}></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                                <lightning-input label="State" value={roleFields.State} data-field="State" placeholder="CA" onchange={handleFieldChange}></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-3 slds-p-bottom_small">
+                                <lightning-input label="Country" value={roleFields.Country} data-field="Country" placeholder="USA" onchange={handleFieldChange}></lightning-input>
+                            </div>
+                        </div>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Cancel" onclick={closeModal} class="slds-m-right_x-small"></lightning-button>
+                        <lightning-button label={modalButtonLabel} variant="brand" onclick={handleSaveRole} disabled={isSaveDisabled}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </div>
+</template>

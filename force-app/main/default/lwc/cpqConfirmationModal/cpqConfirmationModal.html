@@ -1,0 +1,24 @@
+<template>
+    <template if:true={isOpen}>
+        <section role="dialog" tabindex="-1" class="slds-modal slds-fade-in-open slds-modal_small">
+            <div class="slds-modal__container">
+                <div class="modal-content-wrapper">
+                    <div class="modal-header-icon">
+                        <div class="icon-circle">
+                            <lightning-icon icon-name="utility:warning" variant="error" size="large"></lightning-icon>
+                        </div>
+                    </div>
+                    <div class="modal-body-content slds-p-around_large">
+                        <h2 class="modal-title slds-text-align_center slds-m-bottom_medium">{title}</h2>
+                        <p class="modal-message slds-text-align_center">{message}</p>
+                    </div>
+                    <footer class="modal-footer slds-p-around_medium">
+                        <button class="btn-secondary" onclick={handleCancel}>{cancelLabel}</button>
+                        <button class="btn-destructive slds-m-left_small" onclick={handleConfirm}>{confirmLabel}</button>
+                    </footer>
+                </div>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

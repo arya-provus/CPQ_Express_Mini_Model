@@ -1,0 +1,72 @@
+<template>
+    <div class="timeline-container slds-p-top_medium">
+        <h2 class="section-title slds-m-bottom_medium">Project Timeline</h2>
+        
+        <div class="timeline-wrapper">
+            <!-- Timeline Header (Months) -->
+            <div class="timeline-header">
+                <div class="timeline-label-col">Resource / Phase</div>
+                <div class="timeline-months-col">
+                    <span class="month-label">Month 1</span>
+                    <span class="month-label">Month 2</span>
+                    <span class="month-label">Month 3</span>
+                    <span class="month-label">Month 4</span>
+                    <span class="month-label">Month 5</span>
+                    <span class="month-label">Month 6</span>
+                </div>
+            </div>
+
+            <!-- Timeline Rows -->
+            <div class="timeline-body">
+                <template for:each={timelineData} for:item="item">
+                    <div key={item.id} class="timeline-row">
+                        <div class="timeline-label-col">
+                            <span class="item-name">{item.name}</span>
+                            <span class="item-dates">{item.startDate} &rarr; {item.endDate}</span>
+                        </div>
+                        <div class="timeline-months-col">
+                            <div class="timeline-bar-wrapper">
+                                <div class="timeline-bar" style={item.style}></div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+                <template if:false={timelineData.length}>
+                    <div class="slds-p-around_medium slds-text-align_center color-subtle">
+                        <p>No timeline data available. Add line items with dates first.</p>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Approval History Section -->
+        <h2 class="section-title slds-m-top_large slds-m-bottom_medium">Approval Audit Trail</h2>
+        <div class="slds-box slds-theme_default timeline-audit-container">
+            <template if:true={hasHistory}>
+                <ul class="slds-timeline">
+                    <template for:each={approvalHistory} for:item="item">
+                        <li key={item.Id}>
+                            <div class={item.iconClass}>
+                                <lightning-icon icon-name={item.iconName} size="small" variant="inverse"></lightning-icon>
+                            </div>
+                            <div class="timeline-content slds-m-left_large">
+                                <div class="slds-grid slds-grid_align-spread slds-m-bottom_xx-small">
+                                    <h3 class="slds-truncate">
+                                        <strong>{item.Action__c}</strong> by {item.userName}
+                                    </h3>
+                                    <span class="slds-text-body_small color-subtle">{item.formattedDate}</span>
+                                </div>
+                                <p class="slds-text-body_small item-comments">"{item.Comments__c}"</p>
+                            </div>
+                        </li>
+                    </template>
+                </ul>
+            </template>
+            <template if:false={hasHistory}>
+                <div class="slds-p-around_medium slds-text-align_center color-subtle">
+                    <p>No approval history yet.</p>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

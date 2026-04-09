@@ -1,0 +1,107 @@
+<template>
+    <div class="settings-container">
+        <!-- Main Header -->
+        <div class="settings-header">
+            <div class="header-title" onclick={handleBack}>
+                <lightning-icon icon-name="utility:chevronleft" size="x-small" class="slds-m-right_xx-small" variant="bare"></lightning-icon>
+                <h2>Settings</h2>
+            </div>
+            <p class="subtitle">Manage your application preferences and organization settings</p>
+        </div>
+
+        <div class="settings-body">
+            <!-- Left Sidebar Navigation -->
+            <div class="settings-sidebar">
+                <ul class="nav-list">
+                    <template for:each={navItems} for:item="item">
+                        <li key={item.id} class={item.className} onclick={handleNavClick} data-id={item.id}>
+                            <lightning-icon icon-name={item.icon} size="x-small" class="nav-icon"></lightning-icon>
+                            <span>{item.label}</span>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="settings-content">
+                <!-- General Settings View -->
+                <template if:true={isGeneral}>
+                    <div class="section-container">
+                        <div class="section-header">
+                            <lightning-icon icon-name="utility:clock" size="small" class="slds-m-right_x-small"></lightning-icon>
+                            <h3>Billing Time Defaults</h3>
+                        </div>
+                        <p class="section-subtitle">Standard time units used for planning and calculations</p>
+
+                        <!-- Billing Defaults Table -->
+                        <table class="billing-table">
+                            <thead>
+                                <tr>
+                                    <th>Period</th>
+                                    <th>Days</th>
+                                    <th>Calculation</th>
+                                    <th>Total Hours</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>1 Week</strong></td>
+                                    <td>5 days</td>
+                                    <td>5 &times; 8</td>
+                                    <td class="text-blue">40 hours</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>1 Month</strong></td>
+                                    <td>20 days</td>
+                                    <td>20 &times; 8</td>
+                                    <td class="text-blue">160 hours</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>1 Quarter</strong></td>
+                                    <td>60 days</td>
+                                    <td>60 &times; 8</td>
+                                    <td class="text-blue">480 hours</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Example Card -->
+                        <div class="example-card">
+                            <h4 class="example-title">Example Line Item:</h4>
+                            <p class="example-name">Fullstack Developer @ $50/hr</p>
+                            <p class="example-desc">Full-stack development with React & Node.js</p>
+                            
+                            <div class="example-grid">
+                                <div class="example-col">
+                                    <h5 class="example-col-title text-blue">Time Estimate</h5>
+                                    <p>20 days work</p>
+                                    <p>160 hours total</p>
+                                    <p>4 weeks duration</p>
+                                </div>
+                                <div class="example-col">
+                                    <h5 class="example-col-title text-blue">Calculation</h5>
+                                    <p>20 &times; 8 = 160h</p>
+                                    <p>$50/h &times; 160h</p>
+                                    <p class="text-blue"><strong>$8,000 total</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <template if:true={isUsers}>
+                    <div class="section-container">
+                        <c-cpq-user-manager></c-cpq-user-manager>
+                    </div>
+                </template>
+
+                <!-- Other Settings Placeholders -->
+                <template if:true={isOther}>
+                    <div class="section-container placeholder-view">
+                        <p>This settings page is currently under construction.</p>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+</template>

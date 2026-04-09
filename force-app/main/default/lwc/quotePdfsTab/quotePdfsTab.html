@@ -1,0 +1,28 @@
+<template>
+    <div class="pdfs-container slds-p-top_medium">
+        <div class="slds-grid slds-grid_align-spread slds-m-bottom_medium action-bar">
+            <div class="slds-col">
+                <h2 class="section-title">Generated PDF Documents</h2>
+            </div>
+            <div class="slds-col action-buttons">
+                <!-- Mock button as per user's "just create ui" requirement -->
+                <lightning-button variant="brand" label="Generate New PDF"></lightning-button>
+            </div>
+        </div>
+
+        <div class="datatable-wrapper">
+            <lightning-datatable
+                key-field="id"
+                data={pdfData}
+                columns={columns}
+                hide-checkbox-column="true"
+                onrowaction={handleRowAction}>
+            </lightning-datatable>
+            <template if:false={pdfData.length}>
+                <div class="slds-p-around_medium slds-text-align_center empty-state">
+                    <p>No PDFs have been generated for this quote yet.</p>
+                </div>
+            </template>
+        </div>
+    </div>
+</template>

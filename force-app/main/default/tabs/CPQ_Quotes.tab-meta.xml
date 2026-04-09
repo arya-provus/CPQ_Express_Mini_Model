@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>CPQ Quote Management module.</description>
+    <flexiPage>CPQ_Quotes</flexiPage>
+    <label>CPQ Quotes</label>
+    <motif>Custom13: Target</motif>
+</CustomTab>

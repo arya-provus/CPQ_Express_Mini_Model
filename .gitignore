@@ -1,0 +1,43 @@
+# --- Salesforce DX & CLI --- 
+.sf/
+.sfdx/
+.localdevserver/
+deploy-options.json
+# Ignore temporary CLI error logs and deployment output
+sf_error*.json
+deploy_error.json
+deploy_output.txt
+
+# --- LWC & Javascript ---
+node_modules/
+**/lwc/jsconfig.json
+.eslintcache
+.prettiercache
+# LWC Jest coverage reports
+coverage/
+
+# --- Logs ---
+logs/
+*.log
+npm-debug.log*
+
+# --- Environment & Keys ---
+.env
+
+# --- Editor Settings ---
+# It is production standard to ignore user-specific IDE settings
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# --- OS Specific ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Apex Tooling ---
+.pmdCache

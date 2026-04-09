@@ -1,0 +1,134 @@
+<template>
+    <div class="container">
+        <!-- Custom Header -->
+        <template if:false={isModalMode}>
+            <div class="header-container">
+                <div class="title-group">
+                    <div class="back-button">
+                        <lightning-icon icon-name="utility:chevronleft" size="small"></lightning-icon>
+                    </div>
+                    <div class="title-text">
+                        <h1>Products</h1>
+                        <p>View and manage company products</p>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <template if:true={canManageCatalog}>
+                        <lightning-button label="New" variant="brand" icon-name="utility:add" onclick={openModal} class="pill-button slds-m-right_x-small"></lightning-button>
+                    </template>
+                    <lightning-button label="Refresh" variant="neutral" icon-name="utility:refresh" onclick={handleRefresh} class="pill-button"></lightning-button>
+                </div>
+            </div>
+        </template>
+
+        <!-- Search and Filter Bar -->
+        <div class="search-filter-container">
+            <div class="search-wrapper">
+                <lightning-input
+                    type="search"
+                    variant="label-hidden"
+                    placeholder="Search products..."
+                    value={searchKey}
+                    onchange={handleSearchChange}
+                ></lightning-input>
+            </div>
+            
+            <div class="filter-group">
+                <lightning-button-icon icon-name="utility:filterList" variant="border-filled" class="pill-button"></lightning-button-icon>
+                <lightning-button label="All Categories" variant="neutral" icon-name="utility:down" class="filter-pill"></lightning-button>
+                <lightning-badge label={productCount}></lightning-badge>
+            </div>
+        </div>
+
+        <p class="info-text">Showing 1-{productCount} of {productCount}</p>
+
+        <!-- Product Table -->
+        <div class="card-container">
+            <lightning-datatable
+                key-field="Id"
+                data={products}
+                columns={columns}
+                onrowaction={handleRowAction}
+                onrowselection={handleRowSelection}
+                class="custom-table"
+                hide-checkbox-column={hideCheckboxColumn}
+            ></lightning-datatable>
+        </div>
+
+        <!-- Bulk Deletion UI (Hidden in Modal Mode) -->
+        <template if:false={isModalMode}>
+            <template if:true={canManageCatalog}>
+                <!-- Floating Selection Bar -->
+                <template if:true={isSelectionActive}>
+                    <div class="selection-bar-container">
+                        <div class="selection-bar">
+                            <div class="selection-count">
+                                <span class="count-pill">{selectedCount} selected</span>
+                            </div>
+                            <div class="selection-actions">
+                                <lightning-button label="Clear" variant="bare" onclick={handleClearSelection} class="clear-btn"></lightning-button>
+                                <lightning-button label="Delete" variant="destructive" icon-name="utility:delete" onclick={handleBulkDelete} class="bulk-delete-btn"></lightning-button>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </template>
+
+
+            <!-- Premium Confirmation Modal -->
+            <c-cpq-confirmation-modal
+                is-open={isConfirmOpen}
+                title={confirmTitle}
+                message={confirmMessage}
+                onconfirm={executeDelete}
+                oncancel={closeConfirm}
+            ></c-cpq-confirmation-modal>
+        </template>
+
+
+        <!-- Create New Product Modal -->
+        <template if:true={isModalOpen}>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <!-- Modal Header -->
+                    <header class="slds-modal__header">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                            <lightning-icon icon-name="utility:close" alternative-text="close" variant="inverse" size="small"></lightning-icon>
+                        </button>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{modalTitle}</h2>
+                    </header>
+                    <!-- Modal Body -->
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <div class="slds-grid slds-wrap slds-gutters">
+                            <div class="slds-col slds-size_1-of-1 slds-p-bottom_small">
+                                <lightning-input label="Name" value={prodFields.Name} data-field="Name" onchange={handleFieldChange} required></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-1 slds-p-bottom_small">
+                                <lightning-textarea label="Description" value={prodFields.Description} data-field="Description" onchange={handleFieldChange}></lightning-textarea>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-p-bottom_small">
+                                <lightning-input type="number" step="0.01" label="Price" value={prodFields.Price} data-field="Price" onchange={handleFieldChange} required></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-p-bottom_small">
+                                <lightning-input type="number" step="0.01" label="Cost" value={prodFields.Cost} data-field="Cost" onchange={handleFieldChange}></lightning-input>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-p-bottom_small">
+                                <lightning-combobox label="Billing Unit" value={prodFields.BillingUnit} options={billingOptions} data-field="BillingUnit" onchange={handleFieldChange}></lightning-combobox>
+                            </div>
+                            <div class="slds-col slds-size_1-of-2 slds-p-bottom_small">
+                                <lightning-input type="toggle" label="Active" checked={prodFields.IsActive} data-field="IsActive" onchange={handleFieldChange} message-toggle-active="Yes" message-toggle-inactive="No"></lightning-input>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal Footer -->
+                    <footer class="slds-modal__footer">
+                        <lightning-button label="Cancel" onclick={closeModal} class="slds-m-right_x-small"></lightning-button>
+                        <lightning-button label={modalButtonLabel} variant="brand" onclick={handleSaveProduct} disabled={isSaveDisabled}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template>
+    </div>
+</template>

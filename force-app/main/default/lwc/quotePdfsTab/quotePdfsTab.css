@@ -1,0 +1,26 @@
+.pdfs-container {
+    padding-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-top: 0;
+}
+
+.action-bar {
+    align-items: center;
+}
+
+.datatable-wrapper {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.empty-state {
+    color: #64748b;
+    padding: 3rem;
+}

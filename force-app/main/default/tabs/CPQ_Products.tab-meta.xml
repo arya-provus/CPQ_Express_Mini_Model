@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomTab xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>CPQ Product and Pricing Catalog management.</description>
+    <flexiPage>CPQ_Products</flexiPage>
+    <label>CPQ Products</label>
+    <motif>Custom67: Gears</motif>
+</CustomTab>

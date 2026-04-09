@@ -1,0 +1,16 @@
+{
+  "orgName": "CPQ Enterprise Org",
+  "edition": "enterprise",
+  "features": [
+    "AuthorApex"
+  ],
+  "settings": {
+    "orgPreferenceSettings": {
+      "s1DesktopEnabled": true,
+      "chatterEnabled": true
+    },
+    "quoteSettings": {
+      "enableQuote": true
+    }
+  }
+}

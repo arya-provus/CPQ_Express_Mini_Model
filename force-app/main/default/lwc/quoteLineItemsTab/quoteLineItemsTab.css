@@ -1,0 +1,56 @@
+.line-items-container {
+    padding-bottom: 2rem;
+}
+
+.section-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-top: 0;
+}
+
+.action-bar {
+    align-items: center;
+}
+
+.datatable-wrapper {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.empty-state {
+    color: #64748b;
+    padding: 3rem;
+}
+
+/* Modal styling */
+.custom-modal-header {
+    background: #1e293b;
+    color: white;
+    border-bottom: none;
+}
+
+.custom-modal-header .slds-modal__title {
+    font-weight: 600;
+}
+
+.custom-modal-footer {
+    background: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+}
+
+.add-modal-content {
+    background: #f8fafc;
+}
+
+/* Lightning Tabset styling inside modal */
+.add-modal-tabs {
+    --slds-c-tabs-nav-color-background: transparent;
+    --slds-c-tabs-nav-item-spacing-horizontal: 1.5rem;
+}
+
+.color-subtle {
+    color: #64748b;
+}

@@ -1,0 +1,52 @@
+<template>
+    <div class="sidebar-container">
+        <!-- Main Navigation Menu -->
+        <nav class="nav-section" aria-label="CPQ Navigation">
+            <ul class="nav-list">
+                <template for:each={menuItemsWithState} for:item="item">
+                    <li key={item.name} class={item.className}>
+                        <a 
+                            href="javascript:void(0);" 
+                            class="nav-link" 
+                            onclick={handleItemClick}
+                            data-name={item.name}
+                        >
+                            <span class="nav-icon-wrapper">
+                                <lightning-icon 
+                                    icon-name={item.icon} 
+                                    size="x-small"
+                                    variant={item.iconVariant}
+                                ></lightning-icon>
+                            </span>
+                            <span class="nav-label">{item.label}</span>
+                        </a>
+                    </li>
+                </template>
+            </ul>
+        </nav>
+
+        <!-- Bottom Navigation Menu -->
+        <nav class="bottom-nav-section" aria-label="Bottom Navigation">
+            <ul class="nav-list">
+                <template for:each={bottomItems} for:item="item">
+                    <li key={item.name} class="nav-item">
+                        <a 
+                            href="javascript:void(0);" 
+                            class="nav-link"
+                            onclick={handleItemClick}
+                            data-name={item.name}
+                        >
+                            <span class="nav-icon-wrapper">
+                                <lightning-icon 
+                                    icon-name={item.icon} 
+                                    size="x-small"
+                                ></lightning-icon>
+                            </span>
+                            <span class="nav-label">{item.label}</span>
+                        </a>
+                    </li>
+                </template>
+            </ul>
+        </nav>
+    </div>
+</template>

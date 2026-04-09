@@ -1,0 +1,110 @@
+<template>
+    <lightning-card title="Add Quote Line Items" icon-name="standard:quote">
+        <div class="slds-p-around_medium">
+            <p class="slds-text-body_small slds-m-bottom_medium">Select Products, Add-ons, Resource Roles to add to your quote.</p>
+
+            <!-- Navigation Tabs -->
+            <lightning-tabset variant="scoped">
+                <!-- Resource Roles Tab -->
+                <lightning-tab label={roleTabLabel}>
+                    <div class="slds-p-around_medium">
+                        <template if:true={hasRoles}>
+                            <div style="height: 300px;">
+                                <lightning-datatable
+                                    key-field="Id"
+                                    data={availableRoles}
+                                    columns={roleColumns}
+                                    onrowselection={handleRoleSelection}
+                                ></lightning-datatable>
+                            </div>
+                            <div class="slds-m-top_medium slds-grid slds-grid_align-end">
+                                <lightning-button label="Cancel" onclick={handleCancelRoles} class="slds-m-right_x-small"></lightning-button>
+                                <lightning-button 
+                                    label={addRoleLabel} 
+                                    variant="brand" 
+                                    onclick={handleAddRoles} 
+                                    disabled={isAddRolesDisabled}
+                                ></lightning-button>
+                            </div>
+                        </template>
+                        <template if:false={hasRoles}>
+                            <p class="slds-text-color_weak">No resource roles available. Create roles first.</p>
+                        </template>
+                    </div>
+                </lightning-tab>
+
+                <!-- Products Tab -->
+                <lightning-tab label="Products">
+                    <!-- Search Bar -->
+                    <div class="slds-m-vertical_small slds-p-horizontal_medium">
+                        <lightning-input 
+                            type="search" 
+                            placeholder="Search by name, description, or ID..." 
+                            onchange={handleSearchChange}
+                        ></lightning-input>
+                    </div>
+
+                    <!-- Product Table with Multi-selection -->
+                    <div style="height: 300px;">
+                        <lightning-datatable
+                            key-field="Id"
+                            data={filteredProducts}
+                            columns={productColumns}
+                            onrowselection={handleRowSelection}
+                        ></lightning-datatable>
+                    </div>
+
+                    <!-- Footer / Add Button -->
+                    <div class="slds-m-top_medium slds-grid slds-grid_align-end slds-p-horizontal_medium">
+                        <lightning-button label="Cancel" onclick={handleCancel} class="slds-m-right_x-small"></lightning-button>
+                        <lightning-button 
+                            label={addLabel} 
+                            variant="brand" 
+                            onclick={handleAddItems} 
+                            disabled={isAddDisabled}
+                        ></lightning-button>
+                    </div>
+                </lightning-tab>
+
+                <!-- Add-ons Tab -->
+                <lightning-tab label={addonTabLabel}>
+                    <div class="slds-p-around_medium">
+                        <template if:true={hasAddOns}>
+                            <div style="height: 300px;">
+                                <lightning-datatable
+                                    key-field="Id"
+                                    data={availableAddOns}
+                                    columns={addonColumns}
+                                    onrowselection={handleAddonSelection}
+                                ></lightning-datatable>
+                            </div>
+                            <div class="slds-m-top_medium slds-grid slds-grid_align-end">
+                                <lightning-button label="Cancel" onclick={handleCancelAddons} class="slds-m-right_x-small"></lightning-button>
+                                <lightning-button 
+                                    label={addAddonLabel} 
+                                    variant="brand" 
+                                    onclick={handleAddAddons} 
+                                    disabled={isAddAddonsDisabled}
+                                ></lightning-button>
+                            </div>
+                        </template>
+                        <template if:false={hasAddOns}>
+                            <p class="slds-text-color_weak">No add-ons available. Create add-ons first.</p>
+                        </template>
+                    </div>
+                </lightning-tab>
+            </lightning-tabset>
+
+            <!-- Existing Line Items -->
+            <div class="slds-m-top_large">
+                <h3 class="slds-text-heading_small slds-m-bottom_small">Current Line Items</h3>
+                <lightning-datatable
+                    key-field="Id"
+                    data={formattedQuoteLines}
+                    columns={lineColumns}
+                    hide-checkbox-column
+                ></lightning-datatable>
+            </div>
+        </div>
+    </lightning-card>
+</template>
