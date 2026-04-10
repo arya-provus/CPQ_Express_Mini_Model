@@ -36,8 +36,8 @@ export default class QuoteLineItemsTab extends LightningElement {
             { label: 'Name', fieldName: 'itemName', type: 'text' },
             { label: 'Task', fieldName: 'Task__c', type: 'text', editable: editable },
             { label: 'Qty', fieldName: 'Quantity', type: 'number', editable: editable, initialWidth: 70 },
-            { label: 'Base Rate', fieldName: 'Base_Rate__c', type: 'currency' },
-            { label: 'Unit Price', fieldName: 'UnitPrice', type: 'currency', editable: editable },
+            { label: 'Base Rate', fieldName: 'Base_Rate__c', type: 'currency', editable: editable },
+            { label: 'Unit Price', fieldName: 'UnitPrice', type: 'currency' },
             { label: 'Disc %', fieldName: 'Discount__c', type: 'number', editable: editable, initialWidth: 80 },
             { label: 'Disc Amt', fieldName: 'discountAmount', type: 'currency', initialWidth: 100 },
             { label: 'Line Total', fieldName: 'lineTotal', type: 'currency', cellAttributes: { class: 'slds-text-title_caps slds-text-color_success' } },
@@ -104,18 +104,27 @@ export default class QuoteLineItemsTab extends LightningElement {
 
     calculateProjectedTotals() {
         let totalSubtotal = 0;
-        let totalCost = 0;
+        let totalCostLineByLine = 0;
         let totalDiscount = 0;
+        
+        let collectiveBaseRate = 0;
+        let collectiveCost = 0;
 
         const projectedLines = this.lineItems.map(item => {
             const draft = this.draftValues.find(d => d.Id === item.Id) || {};
             
             const qty = draft.Quantity !== undefined ? parseFloat(draft.Quantity) : (item.Quantity || 0);
-            const price = draft.UnitPrice !== undefined ? parseFloat(draft.UnitPrice) : (item.UnitPrice || 0);
+            const baseRate = draft.Base_Rate__c !== undefined ? parseFloat(draft.Base_Rate__c) : (item.Base_Rate__c || 0);
             const discPct = draft.Discount__c !== undefined ? parseFloat(draft.Discount__c) : (item.Discount__c || 0);
             const cost = item.Cost__c || 0;
 
-            const lineTotalRaw = price * qty;
+            collectiveBaseRate += baseRate;
+            collectiveCost += cost;
+
+            const multiplier = item.Base_Rate__c ? (item.UnitPrice / item.Base_Rate__c) : 1;
+            const calculatedPrice = baseRate * multiplier;
+
+            const lineTotalRaw = calculatedPrice * qty;
             const lineTotal = Math.round(lineTotalRaw * 100) / 100;
             const discAmtRaw = lineTotal * (discPct / 100);
             const discAmt = Math.round(discAmtRaw * 100) / 100;
@@ -123,25 +132,29 @@ export default class QuoteLineItemsTab extends LightningElement {
 
             totalSubtotal += lineTotal;
             totalDiscount += discAmt;
-            totalCost += (cost * qty);
+            totalCostLineByLine += (cost * multiplier * qty);
 
             return {
                 ...item,
                 Quantity: qty,
-                UnitPrice: price,
+                Base_Rate__c: baseRate,
+                UnitPrice: calculatedPrice,
                 Discount__c: discPct,
                 discountAmount: discAmt.toFixed(2),
                 lineTotal: subtotal.toFixed(2)
             };
         });
 
+        const marginAmount = collectiveBaseRate - collectiveCost;
+        const marginPct = collectiveBaseRate > 0 ? (marginAmount / collectiveBaseRate) * 100 : 0;
+
         const summary = {
             subtotal: totalSubtotal,
             discount: totalDiscount,
             totalAmount: totalSubtotal - totalDiscount,
-            totalCost: totalCost,
-            marginAmount: (totalSubtotal - totalDiscount) - totalCost,
-            marginPct: totalSubtotal > 0 ? (((totalSubtotal - totalDiscount) - totalCost) / (totalSubtotal - totalDiscount)) * 100 : 0
+            totalCost: totalCostLineByLine,
+            marginAmount: marginAmount,
+            marginPct: marginPct
         };
 
         this.dispatchEvent(new CustomEvent('totalsupdate', {

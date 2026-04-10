@@ -9,13 +9,16 @@
             <!-- Main Content Column -->
             <lightning-layout-item size="10" class="content-wrapper slds-p-left_none">
                 <template if:true={isDashboard}>
-                    <c-cpq-dashboard onviewquote={handleViewQuote}></c-cpq-dashboard>
+                    <c-cpq-dashboard onviewquote={handleViewQuote} onnavselect={handleNavigation}></c-cpq-dashboard>
                 </template>
                 <template if:true={isQuotes}>
                     <c-quote-manager onviewquote={handleViewQuote}></c-quote-manager>
                 </template>
                 <template if:true={isQuoteDetails}>
                     <c-quote-detail-viewer quote-id={currentQuoteId} onback={handleBackToQuotes}></c-quote-detail-viewer>
+                </template>
+                <template if:true={isAccounts}>
+                    <c-cpq-account-manager></c-cpq-account-manager>
                 </template>
                 <template if:true={isProducts}>
                     <c-product-manager></c-product-manager>
@@ -29,7 +32,6 @@
                 <template if:true={isSettings}>
                     <c-cpq-settings onnavselect={handleNavigation}></c-cpq-settings>
                 </template>
-                <!-- Add other templates as needed -->
             </lightning-layout-item>
         </lightning-layout>
     </div>

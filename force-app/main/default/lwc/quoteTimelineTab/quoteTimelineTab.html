@@ -1,72 +1,126 @@
 <template>
-    <div class="timeline-container slds-p-top_medium">
-        <h2 class="section-title slds-m-bottom_medium">Project Timeline</h2>
-        
-        <div class="timeline-wrapper">
-            <!-- Timeline Header (Months) -->
-            <div class="timeline-header">
-                <div class="timeline-label-col">Resource / Phase</div>
-                <div class="timeline-months-col">
-                    <span class="month-label">Month 1</span>
-                    <span class="month-label">Month 2</span>
-                    <span class="month-label">Month 3</span>
-                    <span class="month-label">Month 4</span>
-                    <span class="month-label">Month 5</span>
-                    <span class="month-label">Month 6</span>
-                </div>
-            </div>
+    <div class="tl-wrap">
 
-            <!-- Timeline Rows -->
-            <div class="timeline-body">
-                <template for:each={timelineData} for:item="item">
-                    <div key={item.id} class="timeline-row">
-                        <div class="timeline-label-col">
-                            <span class="item-name">{item.name}</span>
-                            <span class="item-dates">{item.startDate} &rarr; {item.endDate}</span>
-                        </div>
-                        <div class="timeline-months-col">
-                            <div class="timeline-bar-wrapper">
-                                <div class="timeline-bar" style={item.style}></div>
-                            </div>
-                        </div>
-                    </div>
-                </template>
-                <template if:false={timelineData.length}>
-                    <div class="slds-p-around_medium slds-text-align_center color-subtle">
-                        <p>No timeline data available. Add line items with dates first.</p>
-                    </div>
-                </template>
+        <!-- ── Legend ─────────────────────────────────────────────────── -->
+        <div class="legend-bar">
+            <div class="legend-items">
+                <span class="leg-item">
+                    <span class="leg-dot leg-product"></span>
+                    <span>Product</span>
+                </span>
+                <span class="leg-item">
+                    <span class="leg-dot leg-addon"></span>
+                    <span>Add on</span>
+                </span>
+                <span class="leg-item">
+                    <span class="leg-dot leg-role"></span>
+                    <span>Resource Role</span>
+                </span>
             </div>
         </div>
 
-        <!-- Approval History Section -->
-        <h2 class="section-title slds-m-top_large slds-m-bottom_medium">Approval Audit Trail</h2>
-        <div class="slds-box slds-theme_default timeline-audit-container">
-            <template if:true={hasHistory}>
-                <ul class="slds-timeline">
-                    <template for:each={approvalHistory} for:item="item">
-                        <li key={item.Id}>
-                            <div class={item.iconClass}>
-                                <lightning-icon icon-name={item.iconName} size="small" variant="inverse"></lightning-icon>
+        <!-- ── Gantt ─────────────────────────────────────────────────── -->
+        <div class="gantt-card">
+            <div class="gantt-scroll">
+                <table class="gt">
+                    <colgroup>
+                        <col class="col-issues" />
+                        <col class="col-dur" />
+                        <template for:each={ganttMonths} for:item="m">
+                            <col key={m.year} class="col-month" />
+                        </template>
+                    </colgroup>
+
+                    <thead>
+                        <!-- Year row -->
+                        <tr class="yr-row">
+                            <th class="hd-issues sticky-l1">Issues</th>
+                            <th class="hd-dur sticky-l2">Duration</th>
+                            <template for:each={yearHeaders} for:item="yh">
+                                <th key={yh.year} colspan={yh.span} class="hd-year">{yh.year}</th>
+                            </template>
+                        </tr>
+                        <!-- Month row -->
+                        <tr class="mo-row">
+                            <th class="hd-issues sticky-l1"></th>
+                            <th class="hd-dur sticky-l2"></th>
+                            <template for:each={monthHeaders} for:item="mh">
+                                <th key={mh.key} class={mh.headerClass}>{mh.label}</th>
+                            </template>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <template for:each={ganttPhases} for:item="phase">
+                            <!-- Phase header -->
+                            <tr key={phase.name} class="phase-row">
+                                <td colspan={ganttColSpan} class="phase-cell">{phase.name}</td>
+                            </tr>
+                            <!-- Item rows -->
+                            <template for:each={phase.items} for:item="item">
+                                <tr key={item.id} class="item-row">
+                                    <td class="td-issues sticky-l1">
+                                        <span class={item.typeDotClass}></span>
+                                        <span class="iname">{item.name}</span>
+                                    </td>
+                                    <td class="td-dur sticky-l2">
+                                        <span class="dlabel">{item.duration}</span>
+                                    </td>
+                                    <template for:each={item.cells} for:item="cell">
+                                        <td key={cell.key} class={cell.cellClass}>
+                                            <template if:true={cell.hasBar}>
+                                                <div class={item.barClass} style={cell.cellBarStyle}>
+                                                    <template if:true={cell.showLabel}>
+                                                        <lightning-icon
+                                                            icon-name={item.barIconName}
+                                                            size="xx-small"
+                                                            class="bicon">
+                                                        </lightning-icon>
+                                                        <span class="blabel">{item.name}</span>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </td>
+                                    </template>
+                                </tr>
+                            </template>
+                        </template>
+
+                        <template if:false={hasGanttData}>
+                            <tr>
+                                <td colspan={ganttColSpan} class="empty-row">
+                                    <lightning-icon icon-name="utility:gantt_chart" size="large" class="empty-icon"></lightning-icon>
+                                    <p>No items yet. Add line items with start and end dates to see them here.</p>
+                                </td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── Approval Audit Trail ──────────────────────────────────── -->
+        <template if:true={hasHistory}>
+            <div class="audit-wrap">
+                <div class="audit-heading">Approval History</div>
+                <div class="audit-list">
+                    <template for:each={approvalHistory} for:item="h">
+                        <div key={h.Id} class="audit-entry">
+                            <div class={h.iconClass}>
+                                <lightning-icon icon-name={h.iconName} size="x-small" variant="inverse"></lightning-icon>
                             </div>
-                            <div class="timeline-content slds-m-left_large">
-                                <div class="slds-grid slds-grid_align-spread slds-m-bottom_xx-small">
-                                    <h3 class="slds-truncate">
-                                        <strong>{item.Action__c}</strong> by {item.userName}
-                                    </h3>
-                                    <span class="slds-text-body_small color-subtle">{item.formattedDate}</span>
+                            <div class="audit-body">
+                                <div class="audit-top">
+                                    <span class="audit-action"><strong>{h.Action__c}</strong> by {h.userName}</span>
+                                    <span class="audit-date">{h.formattedDate}</span>
                                 </div>
-                                <p class="slds-text-body_small item-comments">"{item.Comments__c}"</p>
+                                <p class="audit-comment">"{h.Comments__c}"</p>
                             </div>
-                        </li>
+                        </div>
                     </template>
-                </ul>
-            </template>
-            <template if:false={hasHistory}>
-                <div class="slds-p-around_medium slds-text-align_center color-subtle">
-                    <p>No approval history yet.</p>
                 </div>
-            </template>
-        </div>
+            </div>
+        </template>
+
     </div>
 </template>

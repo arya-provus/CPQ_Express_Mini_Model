@@ -9,6 +9,7 @@ import recallQuote from '@salesforce/apex/QuoteController.recallQuote';
 import approveQuote from '@salesforce/apex/QuoteController.approveQuote';
 import rejectQuote from '@salesforce/apex/QuoteController.rejectQuote';
 import hasCPQStandardUser from '@salesforce/customPermission/CPQ_Standard_User';
+import currentUserId from '@salesforce/user/Id';
 
 export default class QuoteDetailViewer extends LightningElement {
     @api quoteId;
@@ -25,6 +26,8 @@ export default class QuoteDetailViewer extends LightningElement {
     @track modalConfirmLabel = '';
     @track modalConfirmVariant = '';
     @track currentAction = '';
+
+    @track isPdfModalOpen = false;
 
     @wire(getQuoteById, { quoteId: '$quoteId' })
     wiredQuote(result) {
@@ -52,14 +55,31 @@ export default class QuoteDetailViewer extends LightningElement {
         return this.rawStatus === 'In Review' ? 'Pending Approval' : this.rawStatus;
     }
 
-    get isLocked() {
-        return this.rawStatus === 'In Review'
-            || this.rawStatus === 'Approved'
-            || this.rawStatus === 'Rejected';
+    get isCreator() {
+        return this.quote?.CreatedById === currentUserId;
     }
 
-    get canSubmit()  { return this.rawStatus === 'Draft'; }
-    get canRecall()  { return this.rawStatus === 'In Review' && hasCPQStandardUser; }
+    get isLocked() {
+        const statusLocked = this.rawStatus === 'In Review'
+            || this.rawStatus === 'Approved'
+            || this.rawStatus === 'Rejected';
+            
+        if (hasCPQStandardUser) {
+            return statusLocked || !this.isCreator;
+        }
+        return statusLocked;
+    }
+
+    get canSubmit()  { 
+        if (hasCPQStandardUser) return this.rawStatus === 'Draft' && this.isCreator;
+        return this.rawStatus === 'Draft'; 
+    }
+    
+    get canRecall()  { 
+        if (hasCPQStandardUser) return this.rawStatus === 'In Review' && this.isCreator;
+        return this.rawStatus === 'In Review'; 
+    }
+    
     get canApprove() { return this.rawStatus === 'In Review' && !hasCPQStandardUser; }
     get canReject()  { return this.rawStatus === 'In Review' && !hasCPQStandardUser; }
 
@@ -75,9 +95,7 @@ export default class QuoteDetailViewer extends LightningElement {
 
     get margin() {
         if (this.projectedTotals) {
-            const amount = this.projectedTotals.totalAmount;
-            const sub = this.projectedTotals.subtotal;
-            return amount > 0 ? (((sub - amount) / amount) * 100).toFixed(2) : 0;
+            return this.projectedTotals.marginPct ? this.projectedTotals.marginPct.toFixed(2) : 0;
         }
         return this.quote?.Margin__c ?? 0;
     }
@@ -99,6 +117,28 @@ export default class QuoteDetailViewer extends LightningElement {
             'Rejected':  'slds-badge status-pill-rejected'
         };
         return map[this.rawStatus] || 'slds-badge status-pill-draft';
+    }
+
+    /** True when quote is In Review (used for ⚠ icon in breadcrumb) */
+    get isPending() { return this.rawStatus === 'In Review'; }
+
+    get marginAmount() {
+        return this.quote?.Margin_Amount__c ?? 0;
+    }
+
+    get discountAmount() {
+        return this.quote?.Discount_Amount__c ?? 0;
+    }
+
+    get startDateLabel() {
+        // Quote object exposes ExpirationDate; use CreatedDate as start proxy
+        const d = this.quote?.CreatedDate;
+        return d ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(d)) : 'N/A';
+    }
+
+    get endDateLabel() {
+        const d = this.quote?.ExpirationDate;
+        return d ? new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(d)) : 'N/A';
     }
 
     // ── Approval Logic (Consolidated in Parent) ─────────────────────────
@@ -168,9 +208,10 @@ export default class QuoteDetailViewer extends LightningElement {
         this.isLoading = true;
         try {
             await refreshApex(this.wiredQuoteResult);
-            // Also notify child tabs to refresh their wires
+            // Notify child tabs to refresh their wires
             this.template.querySelector('c-quote-summary-tab')?.refreshAuditTrail();
             this.template.querySelector('c-quote-line-items-tab')?.handleRefresh();
+            this.template.querySelector('c-quote-timeline-tab')?.refresh();
         } finally {
             this.isLoading = false;
         }
@@ -180,6 +221,11 @@ export default class QuoteDetailViewer extends LightningElement {
 
     handleBack() {
         this.dispatchEvent(new CustomEvent('back'));
+    }
+
+    handleQuoteUpdate() {
+        // Triggered by quoteSummaryTab if it modifies the quote
+        this.handleRefresh();
     }
 
     handleTabActive(event) {
@@ -210,7 +256,16 @@ export default class QuoteDetailViewer extends LightningElement {
     }
 
     handleGeneratePDF() {
-        this.showToast('Info', 'PDF generation started...', 'info');
+        this.isPdfModalOpen = true;
+    }
+
+    handlePdfModalClose() {
+        this.isPdfModalOpen = false;
+    }
+
+    handlePdfSaved() {
+        this.handleRefresh();
+        // optionally refresh the Pdfs Tab explicitly if necessary
     }
 
     handleTotalsUpdate(event) {

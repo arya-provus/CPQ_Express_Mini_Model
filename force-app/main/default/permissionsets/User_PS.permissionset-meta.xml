@@ -86,18 +86,18 @@
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
         <object>Opportunity</object>
-        <viewAllRecords>false</viewAllRecords>
+        <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
 
-    <!-- Quote: Create + Read + Edit own records only (no Delete, no ViewAll) -->
+    <!-- Quote: CRUD + View All (can see all quotes, but LWC limits editing/recall to owner) -->
     <objectPermissions>
         <allowCreate>true</allowCreate>
-        <allowDelete>false</allowDelete>
+        <allowDelete>true</allowDelete>
         <allowEdit>true</allowEdit>
         <allowRead>true</allowRead>
         <modifyAllRecords>false</modifyAllRecords>
         <object>Quote</object>
-        <viewAllRecords>false</viewAllRecords>
+        <viewAllRecords>true</viewAllRecords>
     </objectPermissions>
 
     <!-- QuoteLineItem: Create + Read + Edit (parent-controlled sharing) -->

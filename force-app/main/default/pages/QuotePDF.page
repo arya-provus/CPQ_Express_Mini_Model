@@ -1,0 +1,317 @@
+<apex:page renderAs="pdf" controller="QuotePDFController" applyBodyTag="false" applyHtmlTag="false" showHeader="false" sidebar="false" standardStylesheets="false">
+    <html>
+        <head>
+            <style>
+                @page {
+                    size: A4;
+                    margin: 15mm;
+                    @bottom-center {
+                        content: "";
+                    }
+                }
+                body {
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 12px;
+                    color: #333;
+                }
+                .header-wrapper {
+                    width: 100%;
+                    border-bottom: 2px solid #2b35cc;
+                    padding-bottom: 10px;
+                    margin-bottom: 20px;
+                    display: table;
+                }
+                .company-info {
+                    display: table-cell;
+                    width: 50%;
+                    font-size: 11px;
+                }
+                .company-info h1 {
+                    font-size: 24px;
+                    margin: 0 0 5px 0;
+                    color: #000;
+                }
+                .quote-metadata {
+                    display: table-cell;
+                    width: 50%;
+                    text-align: right;
+                    vertical-align: bottom;
+                    font-size: 11px;
+                }
+                .quote-metadata h2 {
+                    font-size: 18px;
+                    margin: 0 0 5px 0;
+                    color: #2b35cc;
+                    text-transform: uppercase;
+                }
+                
+                .section-header {
+                    font-weight: bold;
+                    font-size: 14px;
+                    margin-top: 30px;
+                    margin-bottom: 10px;
+                }
+                .sub-header {
+                    font-weight: bold;
+                    font-size: 11px;
+                    margin-bottom: 5px;
+                    text-transform: uppercase;
+                }
+                .phase-header {
+                    color: #2b35cc;
+                    font-weight: bold;
+                    font-size: 13px;
+                    margin-top: 20px;
+                    margin-bottom: 10px;
+                }
+
+                table.lines-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 10px;
+                    font-size: 11px;
+                }
+                table.lines-table th {
+                    border-top: 1px solid #eee;
+                    border-bottom: 2px solid #ddd;
+                    padding: 8px 5px;
+                    text-align: left;
+                    font-weight: bold;
+                }
+                table.lines-table td {
+                    border-bottom: 1px solid #f0f0f0;
+                    padding: 10px 5px;
+                    vertical-align: top;
+                }
+                table.lines-table th.right-align, table.lines-table td.right-align {
+                    text-align: right;
+                }
+                
+                .item-dates {
+                    color: #888;
+                    font-size: 9px;
+                    margin-top: 4px;
+                }
+
+                .phase-total-row {
+                    font-weight: bold;
+                    font-size: 11px;
+                    padding: 10px 5px;
+                    border-bottom: 1px solid #ddd;
+                    display: table;
+                    width: 100%;
+                    margin-top: 10px;
+                }
+
+                .quote-totals-container {
+                    margin-top: 30px;
+                    width: 100%;
+                }
+                .totals-box {
+                    float: right;
+                    width: 300px;
+                    font-size: 11px;
+                }
+                .totals-row {
+                    display: table;
+                    width: 100%;
+                    padding: 5px 0;
+                }
+                .totals-row.subtotal {
+                    border-bottom: 1px solid #eee;
+                }
+                .totals-row .label {
+                    display: table-cell;
+                    text-align: right;
+                    padding-right: 20px;
+                    font-weight: bold;
+                }
+                .totals-row .value {
+                    display: table-cell;
+                    text-align: right;
+                    width: 100px;
+                    font-weight: bold;
+                }
+                .grand-total-box {
+                    background-color: #2b35cc;
+                    color: white;
+                    padding: 8px 0;
+                    margin-top: 5px;
+                }
+                
+                .clear { clear: both; }
+
+                .terms-section {
+                    page-break-before: always;
+                    font-size: 11px;
+                    margin-top: 30px;
+                }
+                .terms-section h3 {
+                    font-size: 16px;
+                    margin-bottom: 20px;
+                }
+                .terms-grid {
+                    width: 100%;
+                    display: table;
+                }
+                .terms-col {
+                    display: table-cell;
+                    width: 48%;
+                    padding-right: 2%;
+                }
+                .term-item {
+                    margin-bottom: 15px;
+                }
+                .term-item strong {
+                    display: block;
+                    margin-bottom: 3px;
+                }
+                
+                .footer {
+                    margin-top: 50px;
+                    text-align: center;
+                    font-size: 9px;
+                    color: #666;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header-wrapper">
+                <div class="company-info">
+                    <h1>provus</h1>
+                    pune, MH 12345<br/>
+                    us<br/>
+                    1234567890<br/>
+                    qwertyuiop.com
+                </div>
+                <div class="quote-metadata">
+                    <h2>QUOTE</h2>
+                    Quote #: <apex:outputText value="{!quoteRecord.QuoteNumber}"/><br/>
+                    Date: <apex:outputText value="{0,date,MMM dd, yyyy}"><apex:param value="{!quoteRecord.CreatedDate}"/></apex:outputText><br/>
+                    Valid Until: <apex:outputText value="{0,date,MMM dd, yyyy}"><apex:param value="{!quoteRecord.ExpirationDate}"/></apex:outputText><br/>
+                    Prepared By: <apex:outputText value="{!quoteRecord.CreatedBy.Name}"/>
+                </div>
+            </div>
+
+            <!-- Skipped Bill To per user instruction -->
+
+            <div class="section-header">Project Overview</div>
+            <div class="sub-header">DESCRIPTION</div>
+            <p>Professional Services Project<br/>
+               <apex:outputText value="{!quoteRecord.Description}"/></p>
+
+            <div class="section-header">Detailed Price Breakdown</div>
+
+            <div class="phase-header">Phase 1: Default Phase</div>
+            
+            <table class="lines-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Type</th>
+                        <th class="right-align">Quantity</th>
+                        <th class="right-align">Price</th>
+                        <th class="right-align">Discount</th>
+                        <th class="right-align">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <apex:variable var="phaseTotal" value="{!0}"/>
+                    <apex:repeat value="{!formattedLines}" var="line">
+                        <tr>
+                            <td>
+                                <div><apex:outputText value="{!line.itemName}"/></div>
+                                <div class="item-dates"><apex:outputText value="{!line.itemDates}"/></div>
+                            </td>
+                            <td><apex:outputText value="{!line.itemType}"/></td>
+                            <td class="right-align"><apex:outputText value="{!line.quantityStr}"/></td>
+                            <td class="right-align">
+                                <apex:outputText value="{0,number,Currency}">
+                                    <apex:param value="{!line.price}"/>
+                                </apex:outputText>
+                            </td>
+                            <td class="right-align"><apex:outputText value="{!line.discountStr}"/></td>
+                            <td class="right-align">
+                                <apex:outputText value="{0,number,Currency}">
+                                    <apex:param value="{!line.subtotal}"/>
+                                </apex:outputText>
+                            </td>
+                        </tr>
+                        <apex:variable var="phaseTotal" value="{!phaseTotal + line.subtotal}"/>
+                    </apex:repeat>
+                </tbody>
+            </table>
+
+            <div class="phase-total-row">
+                <div style="float: left;">Subtotal</div>
+                <div style="float: right;">
+                    <apex:outputText value="{0,number,Currency}">
+                        <apex:param value="{!phaseTotal}"/>
+                    </apex:outputText>
+                </div>
+                <div class="clear"></div>
+            </div>
+
+            <div class="quote-totals-container">
+                <div class="totals-box">
+                    <div class="totals-row subtotal">
+                        <div class="label">Subtotal:</div>
+                        <div class="value">
+                            <apex:outputText value="{0,number,Currency}">
+                                <apex:param value="{!phaseTotal}"/>
+                            </apex:outputText>
+                        </div>
+                    </div>
+                    <div class="totals-row grand-total-box">
+                        <div class="label">Total Amount:</div>
+                        <div class="value">
+                            <apex:outputText value="{0,number,Currency}">
+                                <apex:param value="{!IF(ISBLANK(quoteRecord.Total_Amount__c), phaseTotal - (phaseTotal * IF(ISBLANK(quoteRecord.Discount__c), 0, quoteRecord.Discount__c) / 100), quoteRecord.Total_Amount__c)}"/>
+                            </apex:outputText>
+                        </div>
+                    </div>
+                </div>
+                <div class="clear"></div>
+            </div>
+
+            <div class="terms-section">
+                <h3>Terms and Conditions</h3>
+                <div class="terms-grid">
+                    <div class="terms-col">
+                        <div class="term-item">
+                            <strong>1. Scope of Work</strong>
+                            Work will be performed according to specifications outlined in this quote. Changes in scope require written approval and may result in additional charges.
+                        </div>
+                        <div class="term-item">
+                            <strong>3. Payment Terms</strong>
+                            Payment schedule must be maintained for project to proceed. Late payments (>15 days) will incur a 1.5% monthly service charge.
+                        </div>
+                        <div class="term-item">
+                            <strong>5. Warranty and Support</strong>
+                            30-day warranty on all custom development work. Bug fixes during warranty period provided at no charge.
+                        </div>
+                    </div>
+                    <div class="terms-col">
+                        <div class="term-item">
+                            <strong>2. Timeline and Delivery</strong>
+                            Project timeline is estimated based on current requirements. Delays caused by client feedback or scope changes may extend timeline.
+                        </div>
+                        <div class="term-item">
+                            <strong>4. Intellectual Property</strong>
+                            Client will own all custom code and designs upon final payment. Third-party licenses remain property of respective owners.
+                        </div>
+                        <div class="term-item">
+                            <strong>6. Acceptance</strong>
+                            Quote valid for 30 days from date issued. Project begins upon signed contract and initial deposit.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer">
+                This quote is created by Provus Express Quoting product. To learn more, check this out - https://provus.ai/cpq-express
+            </div>
+
+        </body>
+    </html>
+</apex:page>

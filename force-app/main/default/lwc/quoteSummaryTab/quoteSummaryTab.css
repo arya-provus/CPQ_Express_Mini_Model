@@ -1,128 +1,412 @@
+/* ── Summary Container ───────────────────────────────────────────── */
 .summary-container {
-    padding-bottom: 2rem;
+    padding: 1rem 0;
+    font-family: 'Salesforce Sans', 'Inter', system-ui, sans-serif;
 }
 
-.section-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #1e293b;
-    margin-top: 1.5rem;
-    padding-left: 0.25rem;
+/* ── Info Grid Card ──────────────────────────────────────────────── */
+.info-grid-card {
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
 }
 
-.detail-items {
-    padding-bottom: 1rem;
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 0.75rem 1rem;
+    margin-bottom: 0.75rem;
 }
 
-.detail-row {
+.info-cell {
     display: flex;
-    justify-content: space-between;
-    padding: 10px 0;
-    border-bottom: 1px solid #f1f5f9;
+    flex-direction: column;
+    gap: 3px;
 }
 
-.detail-row:last-child {
-    border-bottom: none;
-}
-
-.detail-label {
-    color: #64748b;
+.info-label {
+    font-size: 0.72rem;
+    color: #706e6b;
     font-weight: 500;
-    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
-.detail-value {
-    color: #0f172a;
+.info-value {
+    font-size: 0.875rem;
+    color: #181818;
     font-weight: 600;
-    font-size: 0.875rem;
 }
 
-.revenue-card {
+.account-link {
+    color: #0176d3;
+    cursor: pointer;
+}
+
+.info-grid-extra {
     display: flex;
     align-items: center;
-    padding: 1.25rem;
-    border-radius: 0.5rem;
-    color: white;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid #f0f0f0;
 }
 
-.labor-card {
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+/* ── Revenue + Approval Row ──────────────────────────────────────── */
+.revenue-approval-row {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: start;
 }
 
-.product-card {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+.revenue-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
 }
 
-.addon-card {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+/* ── Revenue Card ────────────────────────────────────────────────── */
+.rev-card {
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 1rem;
+    transition: box-shadow 0.2s;
+}
+.rev-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+
+.rev-card-top {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.75rem;
 }
 
-.card-icon {
+.rev-icon-wrap {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    width: 48px;
-    height: 48px;
-    margin-right: 1rem;
+    flex-shrink: 0;
 }
 
-.card-info {
+.labor-icon   { background: #0176d3; }
+.product-icon { background: #2e7d32; }
+.addon-icon   { background: #9c27b0; }
+
+.rev-meta {
     display: flex;
     flex-direction: column;
+    flex: 1;
 }
 
-.card-title {
-    font-size: 0.875rem;
-    font-weight: 500;
-    opacity: 0.9;
-    margin-bottom: 0.25rem;
+.rev-type {
+    font-size: 0.72rem;
+    color: #706e6b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
 }
 
-.card-amount {
-    font-size: 1.5rem;
+.rev-trend {
+    font-size: 0.72rem;
     font-weight: 700;
+    color: #2e7d32;
+}
+.rev-trend-down { color: #c62828; }
+
+.rev-amount {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #181818;
+    margin: 0 0 0.3rem;
 }
 
-/* Approval History Styles */
-.approval-history-list {
-    max-height: 400px;
-    overflow-y: auto;
+.rev-sub {
+    font-size: 0.72rem;
+    color: #706e6b;
+    margin: 0 0 0.3rem;
 }
 
-.history-item {
-    padding: 0.75rem;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
+.rev-footer {
+    font-size: 0.72rem;
+    color: #b0adab;
+    margin: 0;
 }
 
-.history-header {
-    display: flex;
-    justify-content: flex-start;
-    font-size: 0.875rem;
+/* ── Approval History Panel ──────────────────────────────────────── */
+.approval-panel {
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 1rem;
+    min-height: 160px;
 }
 
-.user-name {
-    color: #1e293b;
+.approval-panel-header {
+    margin-bottom: 4px;
 }
 
-.action-type {
-    color: #64748b;
-    text-transform: lowercase;
+.approval-panel-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #181818;
 }
 
-.history-comment {
-    font-size: 0.8125rem;
-    color: #475569;
-    padding: 0.5rem;
-    background: white;
-    border-radius: 4px;
-    border-left: 3px solid #cbd5e1;
-}
-
-.history-time {
+.approval-panel-sub {
     font-size: 0.75rem;
+    color: #706e6b;
+    margin: 0 0 0.75rem;
+}
+
+.approval-timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.approval-entry {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.approval-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #e8e8e8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.approval-body { flex: 1; }
+
+.approval-who {
+    font-size: 0.8rem;
+    color: #181818;
+    margin: 0 0 3px;
+}
+
+.approval-action {
+    color: #706e6b;
+    font-weight: 400;
+}
+
+.approval-comment {
+    font-size: 0.75rem;
+    color: #3e3e3c;
+    background: #f8f8f8;
+    border-radius: 4px;
+    padding: 6px 8px;
+    border-left: 3px solid #e2e8f0;
+    margin: 4px 0;
+}
+
+.approval-time {
+    font-size: 0.7rem;
+    color: #b0adab;
+    margin: 0;
+}
+
+.no-approval {
+    text-align: center;
+    padding: 1.5rem 0.5rem;
+}
+.no-approval-icon { font-size: 2rem; margin-bottom: 0.5rem; color: #b0adab; }
+.no-approval-text { font-size: 0.85rem; color: #706e6b; margin: 0 0 4px; font-weight: 600; }
+.no-approval-sub  { font-size: 0.75rem; color: #b0adab; margin: 0; }
+
+/* ── Charts Row ──────────────────────────────────────────────────── */
+.charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 280px;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    align-items: start;
+}
+
+.chart-card {
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.chart-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #181818;
+    margin: 0 0 3px;
+}
+
+.chart-sub {
+    font-size: 0.72rem;
+    color: #706e6b;
+    margin: 0 0 0.75rem;
+}
+
+/* Bar chart */
+.bar-chart {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    height: 120px;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 0.5rem;
+    position: relative;
+}
+
+.bar-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    height: 100%;
+}
+
+.bar-pair {
+    display: flex;
+    gap: 3px;
+    align-items: flex-end;
+    height: calc(100% - 20px);
+    width: 100%;
+    justify-content: center;
+}
+
+.bar {
+    width: 14px;
+    border-radius: 3px 3px 0 0;
+    min-height: 2px;
+    transition: height 0.3s ease;
+}
+
+.bar-cost   { background: #b0c4de; }
+.bar-margin { background: #2563eb; }
+
+.bar-label {
+    font-size: 0.68rem;
+    color: #706e6b;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.chart-legend {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.72rem;
+    color: #706e6b;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    display: inline-block;
+}
+.cost-dot   { background: #b0c4de; }
+.margin-dot { background: #2563eb; }
+.legend-text { margin-right: 0.5rem; }
+
+/* Audit Panel */
+.audit-panel {
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    padding: 1rem;
+}
+
+.audit-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #181818;
+    margin: 0 0 4px;
+}
+
+.audit-sub {
+    font-size: 0.72rem;
+    color: #706e6b;
+    margin: 0 0 0.75rem;
+}
+
+.history-accordion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-top: 1px solid #f0f0f0;
+    cursor: pointer;
+}
+
+.history-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #3e3e3c;
+}
+.history-chevron { color: #b0adab; font-size: 0.8rem; }
+
+/* ── Phase Table ─────────────────────────────────────────────────── */
+.phase-table-card {
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.phase-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.phase-table thead tr {
+    background: #f8f8f8;
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.phase-table th {
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #706e6b;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.phase-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f5f5f5;
+    color: #3e3e3c;
+}
+
+.phase-table tbody tr:last-child td { border-bottom: none; }
+.phase-table tbody tr:hover { background: #f8f8fb; }
+
+.phase-name    { font-weight: 700; color: #181818; }
+.amount-labor  { color: #0176d3; font-weight: 600; }
+.amount-product{ color: #9c27b0; font-weight: 600; }
+.amount-addon  { color: #2e7d32; font-weight: 600; }
+.amount-total  { font-weight: 800; color: #181818; }
+.item-count    { color: #706e6b; text-align: center; }
+
+.empty-phase {
+    text-align: center;
+    color: #b0adab;
+    padding: 1.5rem;
+    font-style: italic;
 }

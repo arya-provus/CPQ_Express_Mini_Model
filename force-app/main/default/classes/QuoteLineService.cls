@@ -24,6 +24,10 @@ public with sharing class QuoteLineService {
             quoteDao.updateQuote(q);
         }
 
+        // Get the time period multiplier for resource role pricing
+        String timePeriod = q.Quote_Time_Period__c;
+        Decimal hoursPerPeriod = getHoursPerPeriod(timePeriod);
+
         List<QuoteLineItem> linesToInsert = new List<QuoteLineItem>();
 
         // 2. Handle standard Products
@@ -53,14 +57,16 @@ public with sharing class QuoteLineService {
             List<Resource_Role__c> roles = [SELECT Id, Name, Base_Rate__c, Cost__c FROM Resource_Role__c WHERE Id IN :roleIds];
             for (Resource_Role__c role : roles) {
                 Id productId = getOrCreateShadowProduct('Resource: ' + role.Name, 'Auto-created for resource role: ' + role.Name);
-                Id pbeId = getOrCreatePricebookEntry(productId, pricebookId, role.Base_Rate__c);
+                // Unit Price = hourly rate × hours per period (e.g. $120/hr × 160 = $19,200 for Months)
+                Decimal unitPrice = role.Base_Rate__c * hoursPerPeriod;
+                Id pbeId = getOrCreatePricebookEntry(productId, pricebookId, unitPrice);
                 
                 linesToInsert.add(new QuoteLineItem(
                     QuoteId = quoteId,
                     Product2Id = productId,
                     PricebookEntryId = pbeId,
                     Quantity = 1,
-                    UnitPrice = role.Base_Rate__c,
+                    UnitPrice = unitPrice,
                     Base_Rate__c = role.Base_Rate__c,
                     Cost__c = role.Cost__c,
                     Resource_Role__c = role.Id,
@@ -122,6 +128,17 @@ public with sharing class QuoteLineService {
         return newPbe.Id;
     }
 
+    /**
+     * Returns the number of working hours in a billing period.
+     * Weeks = 40h, Months = 160h, Quarters = 480h.
+     */
+    private Decimal getHoursPerPeriod(String timePeriod) {
+        if (timePeriod == 'Weeks') return 40;
+        if (timePeriod == 'Quarters') return 480;
+        // Default to Months
+        return 160;
+    }
+
     public Id addQuoteLine(Id quoteId, Id productId, Integer quantity) {
         addItemsToQuote(quoteId, new List<Id>{productId}, null, null);
         return [SELECT Id FROM QuoteLineItem WHERE QuoteId = :quoteId ORDER BY CreatedDate DESC LIMIT 1].Id;
@@ -137,9 +154,6 @@ public with sharing class QuoteLineService {
         return [SELECT Id FROM QuoteLineItem WHERE QuoteId = :quoteId ORDER BY CreatedDate DESC LIMIT 1].Id;
     }
 
-    /**
-     * Updates multiple quote line items.
-     */
     public void updateQuoteLines(List<QuoteLineItem> items) {
         if (items == null || items.isEmpty()) {
             return;
@@ -147,6 +161,32 @@ public with sharing class QuoteLineService {
         
         Id quoteId = [SELECT QuoteId FROM QuoteLineItem WHERE Id = :items[0].Id LIMIT 1].QuoteId;
         quoteService.checkLock(quoteId);
+
+        // Fetch quote info to get time period multiplier
+        Quote q = quoteDao.getQuoteById(quoteId);
+        Decimal hoursPerPeriod = getHoursPerPeriod(q.Quote_Time_Period__c);
+
+        Set<Id> lineIds = new Set<Id>();
+        for (QuoteLineItem item : items) {
+            lineIds.add(item.Id);
+        }
+
+        Map<Id, QuoteLineItem> existingLinesMap = new Map<Id, QuoteLineItem>([
+            SELECT Id, Resource_Role__c, Base_Rate__c, UnitPrice 
+            FROM QuoteLineItem 
+            WHERE Id IN :lineIds
+        ]);
+
+        for (QuoteLineItem item : items) {
+            QuoteLineItem existing = existingLinesMap.get(item.Id);
+            if (existing != null) {
+                Decimal baseRate = item.Base_Rate__c != null ? item.Base_Rate__c : existing.Base_Rate__c;
+                if (baseRate != null) {
+                    Decimal multiplier = (existing.Resource_Role__c != null) ? hoursPerPeriod : 1;
+                    item.UnitPrice = baseRate * multiplier;
+                }
+            }
+        }
 
         lineDao.updateQuoteLines(items);
         recalculateQuoteTotals(quoteId);

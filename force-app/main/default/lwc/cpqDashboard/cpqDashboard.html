@@ -1,93 +1,147 @@
 <template>
     <div class="dashboard-container">
-        <!-- New Header -->
-        <div class="header-container">
-            <div class="title-group">
-                <div class="title-text">
-                    <h1>Express Home</h1>
-                    <p>Welcome to Provus Express Quoting</p>
-                </div>
+
+        <!-- ── Page Header ────────────────────────────────────────────── -->
+        <div class="page-header">
+            <div class="header-left">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Key insights about your quotes</p>
             </div>
-            
-            <div class="action-buttons">
-                <lightning-button label="Refresh" variant="neutral" icon-name="utility:refresh" onclick={handleRefresh} class="pill-button"></lightning-button>
-                <lightning-button label="AI Assistant" variant="neutral" icon-name="utility:magicwand" class="pill-button"></lightning-button>
+            <div class="header-actions">
+                <button class="btn-refresh" onclick={handleRefresh}>
+                    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M1 4v6h6M23 20v-6h-6"/>
+                        <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10M23 14l-4.64 4.36A9 9 0 0 1 3.51 15"/>
+                    </svg>
+                    Refresh
+                </button>
             </div>
         </div>
 
+        <!-- ── Two-column layout ──────────────────────────────────────── -->
+        <div class="main-layout">
 
-        <!-- Quote Insights Cards -->
-        <h2 class="slds-text-heading_small section-title slds-m-bottom_small">Quote Insights</h2>
-        <lightning-layout multiple-rows="true" class="slds-m-bottom_large">
-            <lightning-layout-item size="4" padding="around-small">
-                <div class="insight-card draft-card">
-                    <div class="insight-icon-wrapper">
-                        <lightning-icon icon-name="utility:edit" size="small"></lightning-icon>
-                    </div>
-                    <div class="insight-content">
-                        <p class="insight-value">{draftCount}</p>
-                        <p class="insight-label">Draft Pipeline</p>
-                        <p class="insight-amount">{draftPipelineFormatted}</p>
-                    </div>
-                </div>
-            </lightning-layout-item>
-            <lightning-layout-item size="4" padding="around-small">
-                <div class="insight-card margin-card">
-                    <div class="insight-icon-wrapper">
-                        <lightning-icon icon-name="utility:trending" size="small"></lightning-icon>
-                    </div>
-                    <div class="insight-content">
-                        <p class="insight-value">{highMarginCount}</p>
-                        <p class="insight-label">High Margin Deals</p>
-                        <p class="insight-sub">&gt; 30% Margin</p>
-                    </div>
-                </div>
-            </lightning-layout-item>
-            <lightning-layout-item size="4" padding="around-small">
-                <div class="insight-card won-card">
-                    <div class="insight-icon-wrapper">
-                        <lightning-icon icon-name="utility:check" size="small"></lightning-icon>
-                    </div>
-                    <div class="insight-content">
-                        <p class="insight-value">{wonCount}</p>
-                        <p class="insight-label">Won This Month</p>
-                        <p class="insight-sub">Approved Quotes</p>
-                    </div>
-                </div>
-            </lightning-layout-item>
-        </lightning-layout>
+            <!-- LEFT: Insight Cards -->
+            <div class="left-panel">
 
-        <!-- Recent Quotes Activity Feed -->
-        <h2 class="slds-text-heading_small section-title slds-m-bottom_small">Recent Quotes</h2>
-        <div class="recent-quotes-card">
-            <template if:true={hasRecentQuotes}>
-                <template for:each={recentQuotes} for:item="quote">
-                    <div key={quote.Id} class="quote-feed-item" onclick={handleQuoteClick} data-id={quote.Id}>
-                        <div class="feed-icon">
-                            <lightning-icon icon-name="standard:quote" size="small"></lightning-icon>
+                <h3 class="section-label">Quote Insights</h3>
+                <div class="insights-grid">
+
+                    <!-- Card 1: Awaiting Approval -->
+                    <div class="insight-card awaiting-card" onclick={handleViewPending}>
+                        <div class="card-header-row">
+                            <span class="card-type-label">Awaiting Your Approval</span>
+                            <span class="card-info-icon">ⓘ</span>
                         </div>
-                        <div class="feed-content">
-                            <p class="feed-title">{quote.Name}</p>
-                            <p class="feed-meta">
-                                <span class={quote.statusClass}>{quote.Status}</span>
-                                <template if:true={quote.AccountName}>
-                                    <span class="feed-separator">•</span>
-                                    <span>{quote.AccountName}</span>
-                                </template>
-                            </p>
+                        <p class="card-number awaiting-num">{pendingCount}</p>
+                        <p class="card-sub">{pendingAmountFormatted} pending your</p>
+                        <button class="card-link awaiting-link" onclick={handleViewPending}>Review Now →</button>
+                    </div>
+
+                    <!-- Card 2: Low Margin Drafts -->
+                    <div class="insight-card low-margin-card" onclick={handleViewLowMargin}>
+                        <div class="card-header-row">
+                            <span class="card-type-label">Low Margin Drafts</span>
+                            <span class="card-info-icon">ⓘ</span>
                         </div>
-                        <div class="feed-amount">
-                            <p class="feed-amount-value">{quote.formattedAmount}</p>
-                            <p class="feed-date">{quote.formattedDate}</p>
+                        <p class="card-number low-margin-num">{lowMarginCount}</p>
+                        <p class="card-sub">{lowMarginCount} draft quotes at risk - margins below 15%</p>
+                        <button class="card-link low-margin-link" onclick={handleViewLowMargin}>Review Margins →</button>
+                    </div>
+
+                    <!-- Card 3: Draft Pipeline -->
+                    <div class="insight-card draft-pipeline-card" onclick={handleViewDrafts}>
+                        <div class="card-header-row">
+                            <span class="card-type-label">Draft Pipeline</span>
+                            <span class="card-info-icon">ⓘ</span>
+                        </div>
+                        <p class="card-number draft-num">{draftCount}</p>
+                        <p class="card-sub">{draftPipelineFormatted} potential revenue in drafts</p>
+                        <button class="card-link draft-link" onclick={handleViewDrafts}>View Drafts →</button>
+                    </div>
+
+                    <!-- Card 4: High Margin Deals -->
+                    <div class="insight-card high-margin-card" onclick={handleViewHighMargin}>
+                        <div class="card-header-row">
+                            <span class="card-type-label">High Margin Deals</span>
+                            <span class="card-info-icon">ⓘ</span>
+                        </div>
+                        <p class="card-number high-margin-num">{highMarginCount}</p>
+                        <p class="card-sub">{highMarginAmountFormatted} with 35%+ profit margin</p>
+                        <button class="card-link high-margin-link" onclick={handleViewHighMargin}>View Opportunities →</button>
+                    </div>
+
+                    <!-- Card 5: Won This Month -->
+                    <div class="insight-card won-card" onclick={handleViewWon}>
+                        <div class="card-header-row">
+                            <span class="card-type-label">Won This Month</span>
+                            <span class="card-info-icon">ⓘ</span>
+                        </div>
+                        <p class="card-number won-num">{wonCount}</p>
+                        <p class="card-sub">{wonAmountFormatted} closed won this month</p>
+                        <button class="card-link won-link" onclick={handleViewWon}>View Wins →</button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- RIGHT: Draft Quotes Panel -->
+            <div class="right-panel">
+                <div class="draft-panel">
+                    <div class="draft-panel-header">
+                        <div>
+                            <p class="draft-panel-title">Your Draft Quotes</p>
+                            <p class="draft-panel-count">{totalQuoteCount} quotes total</p>
                         </div>
                     </div>
-                </template>
-            </template>
-            <template if:false={hasRecentQuotes}>
-                <div class="slds-p-around_large slds-text-align_center">
-                    <p class="slds-text-color_weak">No recent quotes found. Create your first quote to get started!</p>
+
+                    <!-- Tabs -->
+                    <div class="draft-tabs">
+                        <button class={allTabClass}      onclick={handleTabAll}>All</button>
+                        <button class={draftTabClass}    onclick={handleTabDraft}>Draft</button>
+                        <button class={pendingTabClass}  onclick={handleTabPending}>Pending</button>
+                        <button class={approvedTabClass} onclick={handleTabApproved}>Approved</button>
+                        <button class={rejectedTabClass} onclick={handleTabRejected}>Rejected</button>
+                    </div>
+
+                    <!-- Create New Quote Button -->
+                    <div class="create-btn-wrap">
+                        <button class="create-quote-btn" onclick={handleCreateQuote}>
+                            + &nbsp;Create New Quote
+                        </button>
+                    </div>
+
+                    <!-- Quote List -->
+                    <div class="draft-quote-list">
+                        <template if:true={hasFilteredQuotes}>
+                            <template for:each={filteredPanelQuotes} for:item="quote">
+                                <div key={quote.Id} class="draft-quote-item" onclick={handleQuoteClick} data-id={quote.Id}>
+                                    <div class="quote-item-icon">
+                                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                            <polyline points="14 2 14 8 20 8"/>
+                                        </svg>
+                                    </div>
+                                    <div class="quote-item-body">
+                                        <div class="quote-item-top">
+                                            <span class="quote-item-num">{quote.QuoteNumber}</span>
+                                            <span class={quote.statusPillClass}>{quote.Status}</span>
+                                        </div>
+                                        <p class="quote-item-time">{quote.timeAgo}</p>
+                                    </div>
+                                    <div class="quote-item-amount">{quote.formattedAmount}</div>
+                                </div>
+                            </template>
+                        </template>
+                        <template if:false={hasFilteredQuotes}>
+                            <div class="empty-panel">
+                                <p>No quotes found.</p>
+                            </div>
+                        </template>
+                    </div>
                 </div>
-            </template>
+            </div>
+
         </div>
     </div>
 </template>

@@ -1,114 +1,234 @@
 <template>
-    <div class="summary-container slds-p-top_medium">
-        <!-- Progress Bar Only (Buttons removed as they are now in the Global Header) -->
-        <div class="slds-box slds-theme_default slds-m-bottom_medium approval-header">
-            <div class="slds-grid slds-grid_vertical-align-center slds-grid_align-center">
-                <div class="slds-col slds-size_11-of-12">
-                    <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
-                        <lightning-progress-step label="Draft" value="1"></lightning-progress-step>
-                        <lightning-progress-step label="In Review" value="2"></lightning-progress-step>
-                        <lightning-progress-step label={stepValue} value="3"></lightning-progress-step>
-                    </lightning-progress-indicator>
+    <div class="summary-container">
+
+        <!-- ── Quote Info Grid ───────────────────────────────────────── -->
+        <div class="info-grid-card">
+            <div class="info-grid">
+                <div class="info-cell">
+                    <span class="info-label">Opportunity</span>
+                    <span class="info-value">{opportunityName}</span>
+                </div>
+                <div class="info-cell">
+                    <span class="info-label">Account</span>
+                    <span class="info-value account-link">{accountName}</span>
+                </div>
+                <div class="info-cell">
+                    <span class="info-label">Valid Until</span>
+                    <span class="info-value">{formattedExpirationDate}</span>
+                </div>
+                <div class="info-cell">
+                    <span class="info-label">Quote Time Period</span>
+                    <span class="info-value">{quoteTimePeriod}</span>
+                </div>
+                <div class="info-cell">
+                    <span class="info-label">Created Date</span>
+                    <span class="info-value">{formattedCreatedDate}</span>
+                </div>
+                <div class="info-cell">
+                    <span class="info-label">Created By</span>
+                    <span class="info-value">{createdByName}</span>
                 </div>
             </div>
-        </div>
-
-        <div class="slds-grid slds-gutters slds-m-bottom_large details-grid">
-            <div class="slds-col slds-size_1-of-2">
-                <lightning-card title="Quote Information" icon-name="standard:quote">
-                    <div class="slds-p-horizontal_small detail-items">
-                        <div class="detail-row">
-                            <span class="detail-label">Opportunity</span>
-                            <span class="detail-value">{opportunityName}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Account</span>
-                            <span class="detail-value">{accountName}</span>
-                        </div>
-                    </div>
-                </lightning-card>
-            </div>
-            
-            <div class="slds-col slds-size_1-of-2">
-                <lightning-card title="System Information" icon-name="standard:info">
-                    <div class="slds-p-horizontal_small detail-items">
-                        <div class="detail-row">
-                            <span class="detail-label">Created By</span>
-                            <span class="detail-value">{createdByName}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Created Date</span>
-                            <span class="detail-value">{formattedCreatedDate}</span>
-                        </div>
-                        <div class="detail-row">
-                            <span class="detail-label">Expiration Date</span>
-                            <span class="detail-value">{formattedExpirationDate}</span>
-                        </div>
-                    </div>
-                </lightning-card>
+            <div class="info-grid-extra">
+                <span class="info-label">Last Modified By</span>
+                <span class="info-value">{createdByName}</span>
             </div>
         </div>
 
-        <h2 class="section-title slds-m-bottom_medium">Revenue Breakdown</h2>
-        <div class="slds-grid slds-gutters slds-m-bottom_large cards-grid">
-            <div class="slds-col slds-size_2-of-3">
-                <div class="slds-grid slds-gutters">
-                    <div class="slds-col slds-size_1-of-3">
-                        <div class="revenue-card labor-card">
-                            <div class="card-icon"><lightning-icon icon-name="standard:service_resource" size="medium" variant="inverse"></lightning-icon></div>
-                            <div class="card-info">
-                                <span class="card-title">Labor Revenue</span>
-                                <span class="card-amount"><lightning-formatted-number format-style="currency" currency-code="USD" value={laborRevenue}></lightning-formatted-number></span>
-                            </div>
+        <!-- ── Revenue Cards + Approval History ─────────────────────── -->
+        <div class="revenue-approval-row">
+
+            <!-- Revenue Cards (3) -->
+            <div class="revenue-cards">
+
+                <!-- Labor Revenue Card -->
+                <div class="rev-card labor-rev-card">
+                    <div class="rev-card-top">
+                        <div class="rev-icon-wrap labor-icon">
+                            <lightning-icon icon-name="standard:service_resource" size="small" variant="inverse"></lightning-icon>
+                        </div>
+                        <div class="rev-meta">
+                            <span class="rev-type">Labor Revenue</span>
+                            <span class="rev-trend">{laborTrend}</span>
                         </div>
                     </div>
-                    <div class="slds-col slds-size_1-of-3">
-                        <div class="revenue-card product-card">
-                            <div class="card-icon"><lightning-icon icon-name="standard:product" size="medium" variant="inverse"></lightning-icon></div>
-                            <div class="card-info">
-                                <span class="card-title">Products Revenue</span>
-                                <span class="card-amount"><lightning-formatted-number format-style="currency" currency-code="USD" value={productRevenue}></lightning-formatted-number></span>
-                            </div>
+                    <p class="rev-amount">{laborRevenueFormatted}</p>
+                    <p class="rev-sub">Cost: {laborCostFormatted} • Margin: {laborMarginFormatted}</p>
+                    <p class="rev-footer">{laborCount} Resource Roles</p>
+                </div>
+
+                <!-- Products Revenue Card -->
+                <div class="rev-card product-rev-card">
+                    <div class="rev-card-top">
+                        <div class="rev-icon-wrap product-icon">
+                            <lightning-icon icon-name="standard:product" size="small" variant="inverse"></lightning-icon>
+                        </div>
+                        <div class="rev-meta">
+                            <span class="rev-type">Products Revenue</span>
+                            <span class="rev-trend rev-trend-down">{productTrend}</span>
                         </div>
                     </div>
-                    <div class="slds-col slds-size_1-of-3">
-                        <div class="revenue-card addon-card">
-                            <div class="card-icon"><lightning-icon icon-name="standard:waits" size="medium" variant="inverse"></lightning-icon></div>
-                            <div class="card-info">
-                                <span class="card-title">Add-ons Revenue</span>
-                                <span class="card-amount"><lightning-formatted-number format-style="currency" currency-code="USD" value={addonRevenue}></lightning-formatted-number></span>
-                            </div>
+                    <p class="rev-amount">{productRevenueFormatted}</p>
+                    <p class="rev-sub">Cost: {productCostFormatted} • Margin: {productMarginFormatted}</p>
+                    <p class="rev-footer">{productCount} Products</p>
+                </div>
+
+                <!-- Add-ons Revenue Card -->
+                <div class="rev-card addon-rev-card">
+                    <div class="rev-card-top">
+                        <div class="rev-icon-wrap addon-icon">
+                            <lightning-icon icon-name="standard:waits" size="small" variant="inverse"></lightning-icon>
+                        </div>
+                        <div class="rev-meta">
+                            <span class="rev-type">Add-ons Revenue</span>
+                            <span class="rev-trend">{addonTrend}</span>
                         </div>
                     </div>
+                    <p class="rev-amount">{addonRevenueFormatted}</p>
+                    <p class="rev-sub">Cost: {addonCostFormatted} • Margin: {addonMarginFormatted}</p>
+                    <p class="rev-footer">{addonCount} Add-on items</p>
                 </div>
             </div>
 
             <!-- Approval History Panel -->
-            <div class="slds-col slds-size_1-of-3">
-                <lightning-card title="Approval History" icon-name="standard:approval">
-                    <div class="slds-p-horizontal_small approval-history-list">
-                        <template if:true={hasApprovalHistory}>
-                            <template for:each={approvalHistory} for:item="hist">
-                                <div key={hist.Id} class="history-item slds-m-bottom_small">
-                                    <div class="history-header">
-                                        <span class="user-name"><strong>{hist.Action_By__r.Name}</strong></span>
-                                        <span class="action-type slds-m-left_xx-small">{hist.Action__c}</span>
-                                    </div>
-                                    <template if:true={hist.Comments__c}>
-                                        <div class="history-comment slds-m-top_xx-small">{hist.Comments__c}</div>
-                                    </template>
-                                    <div class="history-time slds-text-color_weak slds-m-top_xx-small">
-                                        {hist.relativeTime} • {hist.formattedDate}
-                                    </div>
+            <div class="approval-panel">
+                <div class="approval-panel-header">
+                    <span class="approval-panel-title">Approval History</span>
+                </div>
+                <p class="approval-panel-sub">Track the approval process for this quote.</p>
+
+                <template if:true={hasApprovalHistory}>
+                    <ul class="approval-timeline">
+                        <template for:each={approvalHistory} for:item="hist">
+                            <li key={hist.Id} class="approval-entry">
+                                <div class="approval-avatar">
+                                    <lightning-icon icon-name="standard:user" size="x-small"></lightning-icon>
                                 </div>
-                            </template>
+                                <div class="approval-body">
+                                    <p class="approval-who">
+                                        <strong>{hist.Action_By__r.Name}</strong>
+                                        <span class="approval-action"> {hist.Action__c}</span>
+                                    </p>
+                                    <template if:true={hist.Comments__c}>
+                                        <div class="approval-comment">{hist.Comments__c}</div>
+                                    </template>
+                                    <p class="approval-time">{hist.relativeTime} • {hist.formattedDate}</p>
+                                </div>
+                            </li>
                         </template>
-                        <template if:false={hasApprovalHistory}>
-                            <p class="slds-text-color_weak slds-p-around_small">No approval actions tracked yet.</p>
-                        </template>
+                    </ul>
+                </template>
+
+                <template if:false={hasApprovalHistory}>
+                    <div class="no-approval">
+                        <div class="no-approval-icon">📄</div>
+                        <p class="no-approval-text">No approval history yet.</p>
+                        <p class="no-approval-sub">Submit this quote for approval to see the approval history.</p>
                     </div>
-                </lightning-card>
+                </template>
             </div>
         </div>
+
+        <!-- ── Charts Row ─────────────────────────────────────────────── -->
+        <div class="charts-row">
+
+            <!-- Item Type Breakdown -->
+            <div class="chart-card">
+                <p class="chart-title">Item Type Breakdown</p>
+                <p class="chart-sub">Cost and margin distribution by item type</p>
+                <div class="bar-chart">
+                    <div class="bar-group">
+                        <div class="bar-pair">
+                            <div class="bar bar-cost" style={laborCostBarStyle}></div>
+                            <div class="bar bar-margin" style={laborMarginBarStyle}></div>
+                        </div>
+                        <span class="bar-label">Labor</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-pair">
+                            <div class="bar bar-cost" style={productCostBarStyle}></div>
+                            <div class="bar bar-margin" style={productMarginBarStyle}></div>
+                        </div>
+                        <span class="bar-label">Products</span>
+                    </div>
+                    <div class="bar-group">
+                        <div class="bar-pair">
+                            <div class="bar bar-cost" style={addonCostBarStyle}></div>
+                            <div class="bar bar-margin" style={addonMarginBarStyle}></div>
+                        </div>
+                        <span class="bar-label">Add-ons</span>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <span class="legend-dot cost-dot"></span><span class="legend-text">Cost</span>
+                    <span class="legend-dot margin-dot"></span><span class="legend-text">Margin</span>
+                </div>
+            </div>
+
+            <!-- Phase Breakdown Chart -->
+            <div class="chart-card">
+                <p class="chart-title">Phase Breakdown</p>
+                <p class="chart-sub">Cost and margin distribution by project phase</p>
+                <div class="bar-chart">
+                    <template for:each={phaseChartData} for:item="phase">
+                        <div key={phase.name} class="bar-group">
+                            <div class="bar-pair">
+                                <div class="bar bar-cost" style={phase.costBarStyle}></div>
+                                <div class="bar bar-margin" style={phase.marginBarStyle}></div>
+                            </div>
+                            <span class="bar-label">{phase.name}</span>
+                        </div>
+                    </template>
+                </div>
+                <div class="chart-legend">
+                    <span class="legend-dot cost-dot"></span><span class="legend-text">Cost</span>
+                    <span class="legend-dot margin-dot"></span><span class="legend-text">Margin</span>
+                </div>
+            </div>
+
+            <!-- Cost Change Audit / History -->
+            <div class="audit-panel">
+                <p class="audit-title">Cost Change Audit</p>
+                <p class="audit-sub">Track cost changes for line items in this quote.</p>
+                <div class="history-accordion">
+                    <span class="history-label">History (0)</span>
+                    <span class="history-chevron">∨</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Phase Breakdown Table ─────────────────────────────────── -->
+        <div class="phase-table-card">
+            <table class="phase-table">
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Labor</th>
+                        <th>Products</th>
+                        <th>Add-ons</th>
+                        <th>Total</th>
+                        <th>Items</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={phaseTableData} for:item="row">
+                        <tr key={row.phase}>
+                            <td class="phase-name">{row.phase}</td>
+                            <td class="amount-labor">{row.laborFormatted}</td>
+                            <td class="amount-product">{row.productFormatted}</td>
+                            <td class="amount-addon">{row.addonFormatted}</td>
+                            <td class="amount-total">{row.totalFormatted}</td>
+                            <td class="item-count">{row.items}</td>
+                        </tr>
+                    </template>
+                    <template if:false={hasPhaseData}>
+                        <tr>
+                            <td colspan="6" class="empty-phase">No line items yet.</td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 </template>

@@ -1,64 +1,119 @@
 <template>
     <div class="detail-view-container">
-        <!-- Spinner -->
+        <!-- ── Spinner ──────────────────────────────────────────────── -->
         <template if:true={isLoading}>
             <lightning-spinner alternative-text="Loading" size="medium"></lightning-spinner>
         </template>
 
-        <!-- Main Content -->
+        <!-- ── Main Content ─────────────────────────────────────────── -->
         <template if:false={isLoading}>
             <template if:true={quote}>
-                <!-- Header -->
+
+                <!-- ── Header Section ────────────────────────────────── -->
                 <div class="header-section">
-                    <div class="header-top">
-                        <div class="title-area">
-                            <lightning-button-icon icon-name="utility:back" variant="bare" size="large" alternative-text="Back" class="back-button" onclick={handleBack}></lightning-button-icon>
-                            <h1 class="quote-title">{quoteNumber}</h1>
-                            <span class={statusBadgeClass}>{statusLabel}</span>
-                            <template if:true={isLocked}>
-                                <lightning-icon icon-name="utility:lock" size="x-small" title="Quote is locked" class="lock-icon-header"></lightning-icon>
-                            </template>
-                        </div>
-                        <div class="action-buttons">
-                            <template if:true={canSubmit}>
-                                <button class="btn-outline" onclick={handleSubmitForApproval}>Submit for Approval</button>
-                            </template>
-                            <template if:true={canRecall}>
-                                <button class="btn-outline" onclick={handleRecall}>Recall</button>
-                            </template>
-                            <template if:true={canApprove}>
-                                <button class="btn-success" onclick={handleApprove}>Approve</button>
-                            </template>
-                            <template if:true={canReject}>
-                                <button class="btn-danger" onclick={handleReject}>Reject</button>
-                            </template>
-                            <button class="btn-primary" onclick={handleGeneratePDF}>Generate PDF</button>
-                            <button class="btn-primary slds-m-left_x-small" onclick={handleGlobalSave}>Save</button>
-                            <button class="btn-outline slds-m-left_x-small" onclick={handleGlobalRefresh}>Refresh</button>
-                        </div>
+
+                    <!-- Breadcrumb Row -->
+                    <div class="breadcrumb-row">
+                        <button class="breadcrumb-link" onclick={handleBack}>Quotes</button>
+                        <span class="breadcrumb-sep">›</span>
+                        <span class="breadcrumb-current">{quoteNumber}</span>
+                        <span class="breadcrumb-sep">›</span>
+                        <span class={statusBadgeClass}>{statusLabel}</span>
+                        <template if:true={isPending}>
+                            <span class="pending-warn-icon" title="Pending Approval">⚠</span>
+                        </template>
                     </div>
-                    
+
+                    <!-- Description row -->
+                    <div class="description-row">
+                        <span class="desc-edit-icon">✏</span>
+                        <span class="desc-edit-label">Click to edit description</span>
+                    </div>
+
+                    <!-- Action Buttons Row -->
+                    <div class="action-row">
+                        <!-- Draft: Submit for Approval -->
+                        <template if:true={canSubmit}>
+                            <button class="btn-neutral" onclick={handleSubmitForApproval}>Submit for Approval</button>
+                        </template>
+
+                        <!-- In Review: Recall / Approve / Reject -->
+                        <template if:true={canRecall}>
+                            <button class="btn-neutral" onclick={handleRecall}>
+                                <span>↩</span> Recall
+                            </button>
+                        </template>
+                        <template if:true={canApprove}>
+                            <button class="btn-success-outline" onclick={handleApprove}>
+                                <span>✓</span> Approve
+                            </button>
+                        </template>
+                        <template if:true={canReject}>
+                            <button class="btn-danger-outline" onclick={handleReject}>
+                                <span>✕</span> Reject
+                            </button>
+                        </template>
+
+                        <!-- Always visible -->
+                        <div class="pdf-btn-group">
+                            <button class="btn-primary" onclick={handleGeneratePDF}>
+                                ⬇ Generate PDF
+                            </button>
+                        </div>
+                        <button class="btn-primary" onclick={handleGlobalSave}>Save</button>
+                        <button class="btn-neutral" onclick={handleGlobalRefresh}>Refresh</button>
+                    </div>
+
+                    <!-- ── Totals Ribbon ─────────────────────────────── -->
                     <div class="totals-ribbon">
-                        <div class="total-item">
-                            <span class="total-label">Total Amount</span>
-                            <span class="total-value"><lightning-formatted-number format-style="currency" currency-code="USD" value={totalAmount}></lightning-formatted-number></span>
+                        <div class="ribbon-item">
+                            <span class="ribbon-label">Total amount</span>
+                            <span class="ribbon-value total-highlight">
+                                <lightning-formatted-number format-style="currency" currency-code="USD" value={totalAmount}></lightning-formatted-number>
+                            </span>
                         </div>
-                        <div class="total-item">
-                            <span class="total-label">Subtotal</span>
-                            <span class="total-value"><lightning-formatted-number format-style="currency" currency-code="USD" value={subtotal}></lightning-formatted-number></span>
+                        <div class="ribbon-divider"></div>
+                        <div class="ribbon-item">
+                            <span class="ribbon-label">Subtotal</span>
+                            <span class="ribbon-value">
+                                <lightning-formatted-number format-style="currency" currency-code="USD" value={subtotal}></lightning-formatted-number>
+                            </span>
                         </div>
-                        <div class="total-item">
-                            <span class="total-label">Margin %</span>
-                            <span class="total-value">{margin}%</span>
+                        <div class="ribbon-divider"></div>
+                        <div class="ribbon-item">
+                            <span class="ribbon-label">Margin</span>
+                            <span class="ribbon-value">
+                                <lightning-formatted-number format-style="currency" currency-code="USD" value={marginAmount}></lightning-formatted-number>
+                                <span class="ribbon-pct">({margin}%)</span>
+                            </span>
                         </div>
-                        <div class="total-item">
-                            <span class="total-label">Discount %</span>
-                            <span class="total-value">{discount}%</span>
+                        <div class="ribbon-divider"></div>
+                        <div class="ribbon-item">
+                            <span class="ribbon-label">Discount</span>
+                            <span class="ribbon-value">
+                                <lightning-formatted-number format-style="currency" currency-code="USD" value={discountAmount}></lightning-formatted-number>
+                                <span class="ribbon-pct">({discount}%)</span>
+                            </span>
+                        </div>
+                        <div class="ribbon-divider"></div>
+                        <div class="ribbon-item">
+                            <span class="ribbon-label">Start date</span>
+                            <span class="ribbon-value">{startDateLabel}</span>
+                        </div>
+                        <div class="ribbon-divider"></div>
+                        <div class="ribbon-item">
+                            <span class="ribbon-label">End date</span>
+                            <span class="ribbon-value">{endDateLabel}</span>
+                        </div>
+                        <div class="ribbon-divider"></div>
+                        <div class="ribbon-item">
+                            <span class="ribbon-label">Quote time period</span>
+                            <span class="ribbon-value">{quote.Quote_Time_Period__c}</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tabs Area -->
+                <!-- ── Tabs ───────────────────────────────────────────── -->
                 <div class="tabs-section">
                     <lightning-tabset onactive={handleTabActive}>
                         <lightning-tab label="Summary" value="summary">
@@ -68,7 +123,7 @@
                             </c-quote-summary-tab>
                         </lightning-tab>
                         <lightning-tab label="Line Items" value="lineItems">
-                            <c-quote-line-items-tab 
+                            <c-quote-line-items-tab
                                 quote-id={quoteId}
                                 is-locked={isLocked}
                                 onlineschanged={handleLinesChanged}
@@ -76,14 +131,16 @@
                             </c-quote-line-items-tab>
                         </lightning-tab>
                         <lightning-tab label="Timeline" value="timeline">
-                            <c-quote-timeline-tab quote-id={quoteId}></c-quote-timeline-tab>
+                            <c-quote-timeline-tab quote-id={quoteId} quote-record={quote}></c-quote-timeline-tab>
                         </lightning-tab>
                         <lightning-tab label="Generated PDFs" value="pdfs">
                             <c-quote-pdfs-tab quote-id={quoteId}></c-quote-pdfs-tab>
                         </lightning-tab>
                     </lightning-tabset>
                 </div>
+
             </template>
+
             <template if:true={error}>
                 <div class="slds-p-around_medium">
                     <p class="slds-text-color_error">Error loading quote.</p>
@@ -92,13 +149,21 @@
         </template>
     </div>
 
-    <!-- Centralized Approval Modal -->
+    <!-- ── Centralized Approval Modal ───────────────────────────── -->
     <c-quote-action-modal
         is-open={isModalOpen}
         title={modalTitle}
         confirm-label={modalConfirmLabel}
         confirm-variant={modalConfirmVariant}
         oncancel={handleModalCancel}
-        onconfirm={handleModalConfirm}
-    ></c-quote-action-modal>
+        onconfirm={handleModalConfirm}>
+    </c-quote-action-modal>
+
+    <!-- ── PDF Generation Modal ──────────────────────────────────── -->
+    <c-quote-pdf-modal
+        is-open={isPdfModalOpen}
+        quote-id={quoteId}
+        onclose={handlePdfModalClose}
+        onpdfsaved={handlePdfSaved}>
+    </c-quote-pdf-modal>
 </template>

@@ -9,6 +9,8 @@ public inherited sharing class QuoteDAO {
             SELECT Id, Name, QuoteNumber, CreatedBy.Name, CreatedDate, Status,
                    Opportunity.Name, Account__r.Name,
                    Subtotal__c, Total_Amount__c, Margin__c, Discount__c,
+                   Total_Cost__c, Discount_Amount__c, Margin_Amount__c,
+                   Quote_Time_Period__c,
                    OpportunityId, Account__c, Pricebook2Id
             FROM Quote 
             ORDER BY CreatedDate DESC 
@@ -23,9 +25,11 @@ public inherited sharing class QuoteDAO {
      */
     public Quote getQuoteById(Id quoteId) {
         return [
-            SELECT Id, Name, QuoteNumber, CreatedBy.Name, CreatedDate, Status,
+            SELECT Id, Name, QuoteNumber, CreatedById, CreatedBy.Name, CreatedDate, Status,
                    Opportunity.Name, Account__r.Name, Account__c,
                    Subtotal__c, Total_Amount__c, Margin__c, Discount__c,
+                   Total_Cost__c, Discount_Amount__c, Margin_Amount__c,
+                   Quote_Time_Period__c, Additional_Discount__c,
                    OpportunityId, AccountId, Pricebook2Id, ExpirationDate,
                    Account__r.BillingStreet,
                    Account__r.BillingCity,

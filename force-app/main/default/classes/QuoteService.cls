@@ -95,41 +95,69 @@ public without sharing class QuoteService {
     public void recalculateQuoteTotals(Id quoteId) {
         checkLock(quoteId);
         
+        Quote qInfo = dao.getQuoteById(quoteId);
+        Decimal hoursPerPeriod = 160;
+        if (qInfo.Quote_Time_Period__c == 'Weeks') hoursPerPeriod = 40;
+        else if (qInfo.Quote_Time_Period__c == 'Quarters') hoursPerPeriod = 480;
+
         List<QuoteLineItem> lines = [
-            SELECT UnitPrice, Quantity, Discount__c, Base_Rate__c, Cost__c
+            SELECT UnitPrice, Quantity, Discount__c, Base_Rate__c, Cost__c, Resource_Role__c
             FROM QuoteLineItem
             WHERE QuoteId = :quoteId
         ];
 
         Decimal subtotal = 0;
         Decimal lineDiscountAmount = 0;
-        Decimal totalCost = 0;
+        Decimal totalCostLineByLine = 0;
+        
+        Decimal collectiveBaseRate = 0;
+        Decimal collectiveCost = 0;
 
         for (QuoteLineItem line : lines) {
             Decimal qty = line.Quantity != null ? line.Quantity : 0;
-            Decimal price = line.UnitPrice != null ? line.UnitPrice : 0;
-            Decimal discPct = line.Discount__c != null ? line.Discount__c : 0;
+            Decimal baseRate = line.Base_Rate__c != null ? line.Base_Rate__c : 0;
             Decimal cost = line.Cost__c != null ? line.Cost__c : 0;
+            Decimal discPct = line.Discount__c != null ? line.Discount__c : 0;
 
-            Decimal lineSubtotal = (price * qty);
-            Decimal lineDiscount = (lineSubtotal * (discPct / 100));
+            // Collectives for margin - independent of quantity or multipliers
+            collectiveBaseRate += baseRate;
+            collectiveCost += cost;
+
+            Decimal multiplier = (line.Resource_Role__c != null) ? hoursPerPeriod : 1;
+
+            Decimal calculatedUnitPrice = baseRate * multiplier;
+            Decimal lineSubtotal = calculatedUnitPrice * qty;
+            Decimal lineDiscount = lineSubtotal * (discPct / 100);
             
             subtotal += lineSubtotal;
             lineDiscountAmount += lineDiscount;
-            totalCost += (cost * qty);
+            totalCostLineByLine += (cost * multiplier * qty);
         }
 
-        Decimal finalTotalAmount = (subtotal - lineDiscountAmount).setScale(2, RoundingMode.HALF_UP);
-        Decimal margin = finalTotalAmount > 0 ? (((subtotal - finalTotalAmount) / finalTotalAmount) * 100).setScale(2, RoundingMode.HALF_UP) : 0;
-        Decimal finalDiscountPct = subtotal > 0 ? ((lineDiscountAmount / subtotal) * 100).setScale(2, RoundingMode.HALF_UP) : 0;
+        // Additional overall discount calculation
+        Decimal additionalDiscountPct = qInfo.Additional_Discount__c != null ? qInfo.Additional_Discount__c : 0;
+        Decimal finalSubtotal = subtotal - lineDiscountAmount;
+        Decimal overallAddlDiscountAmount = finalSubtotal * (additionalDiscountPct / 100);
+        Decimal totalDiscountAmount = lineDiscountAmount + overallAddlDiscountAmount;
+
+        Decimal finalTotalAmount = (subtotal - totalDiscountAmount).setScale(2, RoundingMode.HALF_UP);
+        
+        // Margin calculated "collectively of all items" directly on base rate vs cost
+        Decimal marginAmount = collectiveBaseRate - collectiveCost;
+        Decimal marginPct = collectiveBaseRate > 0 ? ((marginAmount / collectiveBaseRate) * 100).setScale(2, RoundingMode.HALF_UP) : 0;
+        
+        // Discount percentage relative to subtotal
+        Decimal finalDiscountPct = subtotal > 0 ? ((totalDiscountAmount / subtotal) * 100).setScale(2, RoundingMode.HALF_UP) : 0;
 
         Quote q = new Quote(
             Id = quoteId,
             Subtotal__c = subtotal.setScale(2, RoundingMode.HALF_UP),
             Total_Amount__c = finalTotalAmount,
-            Total_Cost__c = totalCost.setScale(2, RoundingMode.HALF_UP),
-            Margin__c = margin,
-            Discount__c = finalDiscountPct
+            Total_Cost__c = totalCostLineByLine.setScale(2, RoundingMode.HALF_UP),
+            Margin__c = marginPct,
+            Margin_Amount__c = marginAmount.setScale(2, RoundingMode.HALF_UP),
+            Discount__c = finalDiscountPct,
+            Discount_Amount__c = totalDiscountAmount.setScale(2, RoundingMode.HALF_UP)
         );
         dao.updateQuote(q);
     }
@@ -148,11 +176,10 @@ public without sharing class QuoteService {
 
     /**
      * Deletes multiple quotes.
+     * Note: Lock check is intentionally skipped here — System Admins
+     * should be able to delete quotes regardless of status.
      */
     public void deleteQuotes(List<Id> quoteIds) {
-        for (Id quoteId : quoteIds) {
-            checkLock(quoteId);
-        }
         dao.deleteQuotes(quoteIds);
     }
 

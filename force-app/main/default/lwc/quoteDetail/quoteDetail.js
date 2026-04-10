@@ -144,9 +144,26 @@ export default class QuoteDetail extends LightningElement {
     // ── Formatters ───────────────────────────────────────────────────────
 
     get formattedSubtotal() { return this.formatCurrency(this.quote.Subtotal__c); }
-    get formattedDiscount() { return this.formatPercent(this.quote.Discount__c); }
-    get formattedMargin()   { return this.formatPercent(this.quote.Margin__c); }
     get formattedTotal()    { return this.formatCurrency(this.quote.Total_Amount__c); }
+
+    // Margin: show dollar amount and percentage, e.g. "$14,600.00 (46.6%)"
+    get formattedMargin() {
+        const amt = this.quote.Margin_Amount__c || 0;
+        const pct = this.quote.Margin__c || 0;
+        return `${this.formatCurrency(amt)} (${Number(pct).toFixed(1)}%)`;
+    }
+
+    // Discount: show negative dollar amount and percentage, e.g. "-$19,200.00 (-38.0%)"
+    get formattedDiscount() {
+        const amt = this.quote.Discount_Amount__c || 0;
+        const pct = this.quote.Discount__c || 0;
+        if (amt === 0) return '$0.00 (0.0%)';
+        return `-${this.formatCurrency(amt)} (-${Number(pct).toFixed(1)}%)`;
+    }
+
+    get quoteTimePeriod() {
+        return this.quote.Quote_Time_Period__c || 'Months';
+    }
 
     get formattedCreatedDate() {
         return this.quote.CreatedDate

@@ -1,28 +1,71 @@
 <template>
-    <div class="pdfs-container slds-p-top_medium">
-        <div class="slds-grid slds-grid_align-spread slds-m-bottom_medium action-bar">
-            <div class="slds-col">
-                <h2 class="section-title">Generated PDF Documents</h2>
-            </div>
-            <div class="slds-col action-buttons">
-                <!-- Mock button as per user's "just create ui" requirement -->
-                <lightning-button variant="brand" label="Generate New PDF"></lightning-button>
-            </div>
+    <div class="pdfs-container">
+
+        <h2 class="section-title">PDF Versions</h2>
+
+        <div class="pdfs-table-wrapper">
+            <table class="pdfs-table">
+                <thead>
+                    <tr>
+                        <th class="col-num">#</th>
+                        <th>Version</th>
+                        <th>Notes</th>
+                        <th>Total</th>
+                        <th>Margin</th>
+                        <th>Created</th>
+                        <th>Created By</th>
+                        <th class="col-actions">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template if:true={hasPdfs}>
+                        <template for:each={enrichedPdfData} for:item="row">
+                            <tr key={row.id} class="pdf-row">
+                                <td class="col-num">{row.rowNum}</td>
+                                <td class="col-version">
+                                    <span class="version-badge">{row.versionLabel}</span>
+                                    <template if:true={row.isLatest}>
+                                        <span class="latest-badge">Latest</span>
+                                    </template>
+                                </td>
+                                <td class="col-notes">{row.notesDisplay}</td>
+                                <td class="col-total">{row.totalFormatted}</td>
+                                <td class="col-margin">
+                                    <span class="margin-amount">{row.marginAmtFormatted}</span>
+                                    <span class="margin-pct-badge">{row.marginLabel}</span>
+                                </td>
+                                <td class="col-created">{row.createdRelative}</td>
+                                <td class="col-creator">{row.createdByName}</td>
+                                <td class="col-actions">
+                                    <div class="action-icons">
+                                        <button class="icon-btn view-btn" title="View" data-id={row.Id} onclick={handleView}>
+                                            <span>👁</span>
+                                        </button>
+                                        <button class="icon-btn download-btn" title="Download" data-id={row.Id} onclick={handleDownload}>
+                                            <span>⬇</span>
+                                        </button>
+                                        <button class="icon-btn delete-btn" title="Delete" data-id={row.Id} onclick={handleDelete}>
+                                            <span>🗑</span>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </template>
+                    </template>
+                    <template if:false={hasPdfs}>
+                        <tr>
+                            <td colspan="8" class="empty-pdfs">
+                                <div class="empty-content">
+                                    <div class="empty-icon">📄</div>
+                                    <p class="empty-text">No PDFs generated yet</p>
+                                    <p class="empty-sub">Click "Generate PDF" to create a quote document.</p>
+                                </div>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
         </div>
 
-        <div class="datatable-wrapper">
-            <lightning-datatable
-                key-field="id"
-                data={pdfData}
-                columns={columns}
-                hide-checkbox-column="true"
-                onrowaction={handleRowAction}>
-            </lightning-datatable>
-            <template if:false={pdfData.length}>
-                <div class="slds-p-around_medium slds-text-align_center empty-state">
-                    <p>No PDFs have been generated for this quote yet.</p>
-                </div>
-            </template>
-        </div>
     </div>
 </template>
