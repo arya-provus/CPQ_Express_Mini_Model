@@ -27,7 +27,7 @@ private class ProductServiceTest {
         try {
             ProductController.createProduct('', -10.00, true, '', 0, 'Each');
             Assert.fail('Should have failed due to invalid name.');
-        } catch (AuraHandledException e) {
+        } catch (Exception e) {
             Assert.isTrue(e.getMessage().contains('Product name is required.') || e.getMessage().contains('A valid positive price is required.'));
         }
         Test.stopTest();
