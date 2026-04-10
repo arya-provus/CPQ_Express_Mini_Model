@@ -67,13 +67,12 @@ public inherited sharing class QuoteDAO {
         Decimal totalAmt = (Decimal) results[0].get('totalAmt');
         stats.put('totalPipelineAmount', totalAmt != null ? totalAmt : 0);
         
-        // Recent quotes for feed (last 5)
+        // Quotes for feed
         List<Quote> recentQuotes = [
             SELECT Id, Name, QuoteNumber, Status, Total_Amount__c, CreatedDate, 
                    Account__r.Name
             FROM Quote 
             ORDER BY CreatedDate DESC 
-            LIMIT 5
         ];
         stats.put('recentQuotes', recentQuotes);
         

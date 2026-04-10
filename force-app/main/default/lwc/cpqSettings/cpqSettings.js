@@ -6,13 +6,15 @@ export default class CpqSettings extends LightningElement {
     @track navItems = [
         { id: 'general', label: 'General', icon: 'utility:settings', className: 'nav-item active' },
         { id: 'company', label: 'Company Info', icon: 'utility:company', className: 'nav-item' },
-        { id: 'pdf', label: 'PDF', icon: 'utility:page', className: 'nav-item' },
-        { id: 'integrations', label: 'Integrations', icon: 'utility:link', className: 'nav-item' },
         { id: 'users', label: 'Users', icon: 'utility:people', className: 'nav-item' }
     ];
 
     get isGeneral() {
         return this.currentView === 'general';
+    }
+
+    get isCompany() {
+        return this.currentView === 'company';
     }
 
     get isUsers() {

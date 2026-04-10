@@ -13,8 +13,6 @@ export default class CpqSidebar extends LightningElement {
     ];
 
     @track bottomItems = [
-        { name: 'feedback', label: 'Feedback',   icon: 'utility:smiley_and_people' },
-        { name: 'tour',     label: 'Take a Tour', icon: 'utility:play' },
         { name: 'settings', label: 'Settings',    icon: 'utility:settings' }
     ];
 

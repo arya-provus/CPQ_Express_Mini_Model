@@ -178,11 +178,50 @@
         <body>
             <div class="header-wrapper">
                 <div class="company-info">
-                    <h1>provus</h1>
-                    pune, MH 12345<br/>
-                    us<br/>
-                    1234567890<br/>
-                    qwertyuiop.com
+                    <apex:outputPanel rendered="{!NOT(ISBLANK(companyLogoBase64))}">
+                        <img src="data:image/jpeg;base64,{!companyLogoBase64}" style="max-height: 80px; max-width: 200px; display: block; margin-bottom: 5px;" alt="{!$Setup.Company_Settings__c.Company_Name__c}"/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!ISBLANK(companyLogoBase64)}">
+                        <apex:outputPanel rendered="{!NOT(ISBLANK($Setup.Company_Settings__c.Company_Name__c))}">
+                            <h1>{!$Setup.Company_Settings__c.Company_Name__c}</h1>
+                        </apex:outputPanel>
+                        <apex:outputPanel rendered="{!ISBLANK($Setup.Company_Settings__c.Company_Name__c)}">
+                            <h1>provus</h1>
+                        </apex:outputPanel>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel rendered="{!NOT(ISBLANK($Setup.Company_Settings__c.Address__c))}">
+                        {!$Setup.Company_Settings__c.Address__c}<br/>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel rendered="{!OR(NOT(ISBLANK($Setup.Company_Settings__c.City__c)), NOT(ISBLANK($Setup.Company_Settings__c.State__c)), NOT(ISBLANK($Setup.Company_Settings__c.Zip_Code__c)))}">
+                        {!$Setup.Company_Settings__c.City__c}<apex:outputPanel rendered="{!AND(NOT(ISBLANK($Setup.Company_Settings__c.City__c)), OR(NOT(ISBLANK($Setup.Company_Settings__c.State__c)), NOT(ISBLANK($Setup.Company_Settings__c.Zip_Code__c))))}">, </apex:outputPanel>
+                        {!$Setup.Company_Settings__c.State__c} {!$Setup.Company_Settings__c.Zip_Code__c}<br/>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel rendered="{!NOT(ISBLANK($Setup.Company_Settings__c.Country__c))}">
+                        {!$Setup.Company_Settings__c.Country__c}<br/>
+                    </apex:outputPanel>
+                    
+                    <!-- Fallback to defaults if all address fields are missing (just for safe deployment) -->
+                    <apex:outputPanel rendered="{!AND(ISBLANK($Setup.Company_Settings__c.Address__c), ISBLANK($Setup.Company_Settings__c.City__c))}">
+                        pune, MH 12345<br/>
+                        us<br/>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel rendered="{!NOT(ISBLANK($Setup.Company_Settings__c.Phone__c))}">
+                        {!$Setup.Company_Settings__c.Phone__c}<br/>
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!AND(ISBLANK($Setup.Company_Settings__c.Phone__c), ISBLANK($Setup.Company_Settings__c.Address__c))}">
+                        1234567890<br/>
+                    </apex:outputPanel>
+                    
+                    <apex:outputPanel rendered="{!NOT(ISBLANK($Setup.Company_Settings__c.Website__c))}">
+                        {!$Setup.Company_Settings__c.Website__c}
+                    </apex:outputPanel>
+                    <apex:outputPanel rendered="{!AND(ISBLANK($Setup.Company_Settings__c.Website__c), ISBLANK($Setup.Company_Settings__c.Address__c))}">
+                        qwertyuiop.com
+                    </apex:outputPanel>
                 </div>
                 <div class="quote-metadata">
                     <h2>QUOTE</h2>

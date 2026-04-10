@@ -95,6 +95,19 @@ export default class CpqDashboard extends LightningElement {
         return this.filteredPanelQuotes && this.filteredPanelQuotes.length > 0;
     }
 
+    get dynamicPanelTitle() {
+        if (this.activeTab === 'all') return 'All Quotes';
+        if (this.activeTab === 'draft') return 'Your Draft Quotes';
+        if (this.activeTab === 'pending') return 'Pending Quotes';
+        if (this.activeTab === 'approved') return 'Approved Quotes';
+        if (this.activeTab === 'rejected') return 'Rejected Quotes';
+        return 'All Quotes';
+    }
+
+    get filteredQuoteCount() {
+        return this.hasFilteredQuotes ? this.filteredPanelQuotes.length : 0;
+    }
+
     // ── Tab Classes ──────────────────────────────────────────────────
     get allTabClass()      { return this.activeTab === 'all'      ? 'tab-btn tab-active' : 'tab-btn'; }
     get draftTabClass()    { return this.activeTab === 'draft'    ? 'tab-btn tab-active' : 'tab-btn'; }

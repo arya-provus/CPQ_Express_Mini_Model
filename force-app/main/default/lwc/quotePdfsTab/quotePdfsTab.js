@@ -40,8 +40,8 @@ export default class QuotePdfsTab extends NavigationMixin(LightningElement) {
             totalFormatted: row.Total_Amount__c != null
                 ? '$' + Number(row.Total_Amount__c).toLocaleString('en-US', { minimumFractionDigits: 0 })
                 : '-',
-            marginAmtFormatted: row.Margin__c != null
-                ? '$' + Number(row.Margin__c).toLocaleString('en-US', { minimumFractionDigits: 0 })
+            marginAmtFormatted: row.Margin_Amount__c != null
+                ? '$' + Number(row.Margin_Amount__c).toLocaleString('en-US', { minimumFractionDigits: 0 })
                 : '-'
         }));
     }

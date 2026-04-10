@@ -2,14 +2,13 @@ import { LightningElement, track, wire } from 'lwc';
 import getTeamMembers from '@salesforce/apex/TeamManagerController.getTeamMembers';
 import createTeamMember from '@salesforce/apex/TeamManagerController.createTeamMember';
 import deactivateUser from '@salesforce/apex/TeamManagerController.deactivateUser';
-import canManageUsers from '@salesforce/apex/TeamManagerController.canManageUsers';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import { refreshApex } from '@salesforce/apex';
+import hasCPQAdminPermission from '@salesforce/customPermission/CPQ_Admin_User';
 
 export default class CpqUserManager extends LightningElement {
     @track users = [];
     @track isPanelOpen = false;
-    @track canManage = false;
     wiredUsersResult;
     
     @track form = {
@@ -20,14 +19,6 @@ export default class CpqUserManager extends LightningElement {
         role: ''
     };
 
-    @wire(canManageUsers)
-    wiredCanManage({ error, data }) {
-        if (data !== undefined) {
-            this.canManage = data;
-        } else if (error) {
-            console.error('Error fetching manage users permission', error);
-        }
-    }
 
     @wire(getTeamMembers)
     wiredUsers(result) {
@@ -59,9 +50,13 @@ export default class CpqUserManager extends LightningElement {
         });
     }
 
-    get totalSeats() { return 20; }
+    get totalSeats() { return 5; }
     get usedSeats() { return this.users.filter(u => u.isActive).length; }
     get availableSeats() { return this.totalSeats - this.usedSeats; }
+
+    get canManage() {
+        return hasCPQAdminPermission;
+    }
 
     get isAdmin() { return this.form.role === 'Admin'; }
     get isManager() { return this.form.role === 'Manager'; }

@@ -1,0 +1,131 @@
+<template>
+    <div class="company-settings-card">
+        <!-- Header -->
+        <div class="header-section">
+            <div class="header-icon">
+                <lightning-icon icon-name="utility:building" size="small"></lightning-icon>
+            </div>
+            <div class="header-text">
+                <h2 class="title">Company Information</h2>
+                <p class="subtitle">Configure your company details that appear on PDF quotes</p>
+            </div>
+        </div>
+
+        <template if:true={isLoading}>
+            <div class="slds-p-around_large slds-text-align_center">
+                <lightning-spinner alternative-text="Loading..." size="medium"></lightning-spinner>
+            </div>
+        </template>
+
+        <template if:false={isLoading}>
+            <!-- Not Admin Warning (Optional helper text) -->
+            <template if:true={isNotAdmin}>
+                <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_info slds-m-bottom_medium" role="alert">
+                    <span class="slds-assistive-text">info</span>
+                    <h2>You are in read-only mode. Only administrators can edit company information.</h2>
+                </div>
+            </template>
+
+            <!-- Form -->
+            <div class="form-section">
+                <!-- Row 1 -->
+                <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_small">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_small">
+                        <lightning-input label="Company Name" value={settings.Company_Name__c} disabled={isNotAdmin} data-field="Company_Name__c" onchange={handleInputChange}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_small">
+                        <lightning-input label="Email" type="email" value={settings.Email__c} disabled={isNotAdmin} data-field="Email__c" onchange={handleInputChange}></lightning-input>
+                    </div>
+                </div>
+
+                <!-- Row 2 -->
+                <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_small">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_small">
+                        <lightning-input label="Phone" type="tel" value={settings.Phone__c} disabled={isNotAdmin} data-field="Phone__c" onchange={handleInputChange}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-2 slds-m-bottom_small">
+                        <lightning-input label="Website" type="url" value={settings.Website__c} disabled={isNotAdmin} data-field="Website__c" onchange={handleInputChange}></lightning-input>
+                    </div>
+                </div>
+
+                <!-- Row 3 -->
+                <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_small">
+                    <div class="slds-col slds-size_1-of-1 slds-m-bottom_small">
+                        <lightning-input label="Address" value={settings.Address__c} disabled={isNotAdmin} data-field="Address__c" onchange={handleInputChange}></lightning-input>
+                    </div>
+                </div>
+
+                <!-- Row 4 -->
+                <div class="slds-grid slds-wrap slds-gutters slds-m-bottom_large">
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4 slds-m-bottom_small">
+                        <lightning-input label="City" value={settings.City__c} disabled={isNotAdmin} data-field="City__c" onchange={handleInputChange}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4 slds-m-bottom_small">
+                        <lightning-input label="State" value={settings.State__c} disabled={isNotAdmin} data-field="State__c" onchange={handleInputChange}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4 slds-m-bottom_small">
+                        <lightning-input label="Zip Code" value={settings.Zip_Code__c} disabled={isNotAdmin} data-field="Zip_Code__c" onchange={handleInputChange}></lightning-input>
+                    </div>
+                    <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-4 slds-m-bottom_small">
+                        <lightning-input label="Country" value={settings.Country__c} disabled={isNotAdmin} data-field="Country__c" onchange={handleInputChange}></lightning-input>
+                    </div>
+                </div>
+
+                <!-- Brand Logo Section -->
+                <div class="logo-section">
+                    <h3 class="logo-title">Brand Logo</h3>
+                    <p class="logo-subtitle">Choose how your logo appears in generated PDFs.</p>
+                    
+                    <div class="logo-container slds-grid slds-wrap">
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_2-of-3 slds-p-right_large logo-upload-box">
+                            <div class="upload-wrapper">
+                                <div class="upload-info">
+                                    <lightning-icon icon-name="utility:image" size="small" class="slds-m-right_x-small"></lightning-icon>
+                                    <span>PNG or JPEG up to 2 MB</span>
+                                </div>
+                                <div class="upload-actions">
+                                    <template if:false={isNotAdmin}>
+                                        <lightning-file-upload
+                                            name="logoUploader"
+                                            accept={acceptedFormats}
+                                            record-id={currentUserId}
+                                            onuploadfinished={handleUploadFinished}
+                                            multiple="false"
+                                            class="upload-button-hide-label">
+                                        </lightning-file-upload>
+                                        <template if:true={hasLogo}>
+                                            <lightning-button label="Remove" variant="base" class="slds-m-left_medium text-red" onclick={handleRemoveLogo}></lightning-button>
+                                        </template>
+                                    </template>
+                                </div>
+                            </div>
+                            <p class="upload-help">Allowed formats: PNG, JPG, JPEG. Maximum file size: 2 MB.</p>
+                        </div>
+                        <div class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 logo-preview-box">
+                            <p class="preview-label">Logo preview</p>
+                            <div class="preview-content">
+                                <template if:true={hasLogo}>
+                                    <img src={logoUrl} alt="Logo Preview" class="logo-img"/>
+                                </template>
+                                <template if:false={hasLogo}>
+                                    <div class="no-logo">
+                                        <lightning-icon icon-name="utility:image" size="large" class="icon-gray"></lightning-icon>
+                                        <p>No logo selected</p>
+                                    </div>
+                                </template>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Buttons -->
+                <template if:false={isNotAdmin}>
+                    <div class="footer-buttons slds-m-top_large">
+                        <lightning-button label="Discard" variant="neutral" onclick={handleDiscard} class="slds-m-right_small"></lightning-button>
+                        <lightning-button label="Save Company Information" variant="brand" onclick={handleSave}></lightning-button>
+                    </div>
+                </template>
+            </div>
+        </template>
+    </div>
+</template>

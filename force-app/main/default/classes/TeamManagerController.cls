@@ -22,9 +22,8 @@ public with sharing class TeamManagerController {
         return results;
     }
     
-    @AuraEnabled(cacheable=true)
+    @AuraEnabled
     public static Boolean canManageUsers() {
-        // Query the current user's profile
         Id profId = UserInfo.getProfileId();
         List<Profile> profs = [SELECT Name FROM Profile WHERE Id = :profId LIMIT 1];
         if(!profs.isEmpty()) {

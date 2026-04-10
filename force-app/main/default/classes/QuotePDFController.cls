@@ -1,6 +1,7 @@
 public with sharing class QuotePDFController {
     public Quote quoteRecord { get; set; }
     public List<LineItemWrapper> formattedLines { get; set; }
+    public String companyLogoBase64 { get; set; }
 
     public class LineItemWrapper {
         public String itemName { get; set; }
@@ -88,6 +89,25 @@ public with sharing class QuotePDFController {
 
                 formattedLines.add(wrapper);
             }
+        }
+        
+        // Fetch Logo Base64
+        fetchCompanyLogo();
+    }
+    
+    private void fetchCompanyLogo() {
+        try {
+            Company_Settings__c settings = Company_Settings__c.getOrgDefaults();
+            if (settings != null && String.isNotBlank(settings.Logo_Document_Id__c)) {
+                Id docId = (Id)settings.Logo_Document_Id__c;
+                List<ContentVersion> cvs = [SELECT VersionData FROM ContentVersion WHERE ContentDocumentId = :docId AND IsLatest = true LIMIT 1];
+                if (!cvs.isEmpty()) {
+                    companyLogoBase64 = EncodingUtil.base64Encode(cvs[0].VersionData);
+                }
+            }
+        } catch (Exception e) {
+            // Fails safe
+            companyLogoBase64 = null;
         }
     }
 }

@@ -29,10 +29,6 @@
                     <span class="info-value">{createdByName}</span>
                 </div>
             </div>
-            <div class="info-grid-extra">
-                <span class="info-label">Last Modified By</span>
-                <span class="info-value">{createdByName}</span>
-            </div>
         </div>
 
         <!-- ── Revenue Cards + Approval History ─────────────────────── -->
@@ -129,72 +125,107 @@
             </div>
         </div>
 
-        <!-- ── Charts Row ─────────────────────────────────────────────── -->
-        <div class="charts-row">
-
-            <!-- Item Type Breakdown -->
-            <div class="chart-card">
-                <p class="chart-title">Item Type Breakdown</p>
-                <p class="chart-sub">Cost and margin distribution by item type</p>
-                <div class="bar-chart">
-                    <div class="bar-group">
-                        <div class="bar-pair">
-                            <div class="bar bar-cost" style={laborCostBarStyle}></div>
-                            <div class="bar bar-margin" style={laborMarginBarStyle}></div>
-                        </div>
-                        <span class="bar-label">Labor</span>
-                    </div>
-                    <div class="bar-group">
-                        <div class="bar-pair">
-                            <div class="bar bar-cost" style={productCostBarStyle}></div>
-                            <div class="bar bar-margin" style={productMarginBarStyle}></div>
-                        </div>
-                        <span class="bar-label">Products</span>
-                    </div>
-                    <div class="bar-group">
-                        <div class="bar-pair">
-                            <div class="bar bar-cost" style={addonCostBarStyle}></div>
-                            <div class="bar bar-margin" style={addonMarginBarStyle}></div>
-                        </div>
-                        <span class="bar-label">Add-ons</span>
-                    </div>
+        <!-- ── Item Type Breakdown — Full Width Vertical Bar Chart ─── -->
+        <div class="breakdown-card">
+            <div class="breakdown-header">
+                <div>
+                    <p class="breakdown-title">Item Type Breakdown</p>
+                    <p class="breakdown-sub">Cost and margin distribution by item type</p>
                 </div>
-                <div class="chart-legend">
-                    <span class="legend-dot cost-dot"></span><span class="legend-text">Cost</span>
-                    <span class="legend-dot margin-dot"></span><span class="legend-text">Margin</span>
+                <div class="breakdown-legend">
+                    <span class="bl-item">
+                        <span class="bl-swatch bl-cost"></span>Cost
+                    </span>
+                    <span class="bl-item">
+                        <span class="bl-swatch bl-margin"></span>Margin
+                    </span>
+                    <span class="bl-item">
+                        <span class="bl-swatch bl-revenue"></span>Revenue
+                    </span>
                 </div>
             </div>
 
-            <!-- Phase Breakdown Chart -->
-            <div class="chart-card">
-                <p class="chart-title">Phase Breakdown</p>
-                <p class="chart-sub">Cost and margin distribution by project phase</p>
-                <div class="bar-chart">
-                    <template for:each={phaseChartData} for:item="phase">
-                        <div key={phase.name} class="bar-group">
-                            <div class="bar-pair">
-                                <div class="bar bar-cost" style={phase.costBarStyle}></div>
-                                <div class="bar bar-margin" style={phase.marginBarStyle}></div>
+            <!-- Grouped vertical bar chart -->
+            <div class="vbar-chart">
+                <template for:each={itemTypeChartData} for:item="row">
+                    <div key={row.type} class="vbar-group">
+
+                        <!-- 3 bars per group -->
+                        <div class="vbar-bars">
+
+                            <!-- Revenue bar -->
+                            <div class="vbar-col">
+                                <div class="vbar-label-top">
+                                    <span class="vb-num vb-num-rev">{row.revLabel}</span>
+                                    <span class="vbar-pct-top pct-neutral">{row.revPct}%</span>
+                                </div>
+                                <div class="vbar-track">
+                                    <div class="vbar-seg vbar-rev" style={row.revBarStyle}></div>
+                                </div>
+                                <span class="vbar-bar-lbl lbl-rev">Rev</span>
                             </div>
-                            <span class="bar-label">{phase.name}</span>
+
+                            <!-- Cost bar -->
+                            <div class="vbar-col">
+                                <div class="vbar-label-top">
+                                    <span class="vb-num vb-num-cost">{row.costLabel}</span>
+                                    <span class="vbar-pct-top pct-neutral">{row.costPct}%</span>
+                                </div>
+                                <div class="vbar-track">
+                                    <div class="vbar-seg vbar-cost" style={row.costBarStyle}></div>
+                                </div>
+                                <span class="vbar-bar-lbl lbl-cost">Cost</span>
+                            </div>
+
+                            <!-- Margin bar -->
+                            <div class="vbar-col">
+                                <div class="vbar-label-top">
+                                    <span class="vb-num vb-num-mgn">{row.marginLabel}</span>
+                                    <span class={row.marginPctClass}>{row.marginPct}%</span>
+                                </div>
+                                <div class="vbar-track">
+                                    <div class="vbar-seg vbar-mgn" style={row.marginBarStyle}></div>
+                                </div>
+                                <span class="vbar-bar-lbl lbl-mgn">Margin</span>
+                            </div>
                         </div>
-                    </template>
-                </div>
-                <div class="chart-legend">
-                    <span class="legend-dot cost-dot"></span><span class="legend-text">Cost</span>
-                    <span class="legend-dot margin-dot"></span><span class="legend-text">Margin</span>
-                </div>
+
+                        <!-- Group label (type name + item count) -->
+                        <div class="vbar-group-footer">
+                            <span class={row.dotClass}></span>
+                            <span class="vbar-type-name">{row.type}</span>
+                            <span class="vbar-item-count">({row.itemCount})</span>
+                        </div>
+                    </div>
+                </template>
+
+                <template if:false={hasLineData}>
+                    <div class="vbar-empty">
+                        <p>No line items yet. Add items to see cost &amp; margin breakdown.</p>
+                    </div>
+                </template>
             </div>
 
-            <!-- Cost Change Audit / History -->
-            <div class="audit-panel">
-                <p class="audit-title">Cost Change Audit</p>
-                <p class="audit-sub">Track cost changes for line items in this quote.</p>
-                <div class="history-accordion">
-                    <span class="history-label">History (0)</span>
-                    <span class="history-chevron">∨</span>
+            <!-- Total summary row -->
+            <template if:true={hasLineData}>
+                <div class="breakdown-totals">
+                    <div class="bt-cell">
+                        <span class="bt-label">Total Revenue</span>
+                        <span class="bt-value bt-rev">{totalRevenueFormatted}</span>
+                    </div>
+                    <div class="bt-divider"></div>
+                    <div class="bt-cell">
+                        <span class="bt-label">Total Cost</span>
+                        <span class="bt-value bt-cost">{totalCostLineFormatted}</span>
+                    </div>
+                    <div class="bt-divider"></div>
+                    <div class="bt-cell">
+                        <span class="bt-label">Overall Margin</span>
+                        <span class="bt-value bt-mgn">{overallMarginFormatted}</span>
+                        <span class="bt-pct">({overallMarginPct}%)</span>
+                    </div>
                 </div>
-            </div>
+            </template>
         </div>
 
         <!-- ── Phase Breakdown Table ─────────────────────────────────── -->

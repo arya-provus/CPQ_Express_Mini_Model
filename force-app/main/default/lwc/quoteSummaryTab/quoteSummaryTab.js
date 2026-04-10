@@ -161,18 +161,83 @@ export default class QuoteSummaryTab extends LightningElement {
         return (this.addonMargin >= 0 ? '↗ ' : '↘ ') + pct + '%';
     }
 
-    // ── Bar chart styles ─────────────────────────────────────────────
+    // ── Rich chart data for horizontal grouped bar chart ────────────
+    get itemTypeChartData() {
+        const totalRev  = this.laborRevenue + this.productRevenue + this.addonRevenue;
+        const totalCostL = this.laborCost + this.productCost + this.addonCost;
+        const maxVal    = Math.max(totalRev, totalCostL, 1);
+
+        const rows = [
+            {
+                type:      'Labor',
+                rev:       this.laborRevenue,
+                cost:      this.laborCost,
+                margin:    this.laborMargin,
+                itemCount: this.laborCount,
+                dotClass:  'hbar-dot hbar-dot-labor'
+            },
+            {
+                type:      'Products',
+                rev:       this.productRevenue,
+                cost:      this.productCost,
+                margin:    this.productMargin,
+                itemCount: this.productCount,
+                dotClass:  'hbar-dot hbar-dot-product'
+            },
+            {
+                type:      'Add-ons',
+                rev:       this.addonRevenue,
+                cost:      this.addonCost,
+                margin:    this.addonMargin,
+                itemCount: this.addonCount,
+                dotClass:  'hbar-dot hbar-dot-addon'
+            }
+        ];
+
+        return rows.map(r => {
+            const revPct    = totalRev  > 0 ? ((r.rev    / totalRev)  * 100).toFixed(1) : '0.0';
+            const costPct   = totalCostL > 0 ? ((r.cost   / totalCostL) * 100).toFixed(1) : '0.0';
+            const marginPct = r.rev > 0      ? ((r.margin / r.rev)     * 100).toFixed(1) : '0.0';
+            const marginPositive = r.margin >= 0;
+
+            const revW    = maxVal > 0 ? Math.max(0, Math.min(100, (r.rev    / maxVal) * 100)) : 0;
+            const costW   = maxVal > 0 ? Math.max(0, Math.min(100, (r.cost   / maxVal) * 100)) : 0;
+            const marginW = maxVal > 0 ? Math.max(0, Math.min(100, (Math.abs(r.margin) / maxVal) * 100)) : 0;
+
+            return {
+                ...r,
+                revLabel:       this.fmt(r.rev),
+                costLabel:      this.fmt(r.cost),
+                marginLabel:    this.fmt(r.margin),
+                revPct,
+                costPct,
+                marginPct,
+                marginPositive,
+                marginPctClass: marginPositive ? 'vbar-pct-top pct-pos' : 'vbar-pct-top pct-neg',
+                revBarStyle:    `height:${revW}%`,
+                costBarStyle:   `height:${costW}%`,
+                marginBarStyle: `height:${marginW}%`
+            };
+        });
+    }
+
+    // ── Totals for the chart summary footer ─────────────────────────
+    get totalRevenueLine()        { return this.laborRevenue + this.productRevenue + this.addonRevenue; }
+    get totalCostLine()           { return this.laborCost + this.productCost + this.addonCost; }
+    get overallMargin()           { return this.totalRevenueLine - this.totalCostLine; }
+    get totalRevenueFormatted()   { return this.fmt(this.totalRevenueLine); }
+    get totalCostLineFormatted()  { return this.fmt(this.totalCostLine); }
+    get overallMarginFormatted()  { return this.fmt(this.overallMargin); }
+    get overallMarginPct() {
+        if (!this.totalRevenueLine) return '0.00';
+        return (this.overallMargin / this.totalRevenueLine * 100).toFixed(2);
+    }
+    get hasLineData() { return this.rawLines && this.rawLines.length > 0; }
+
+    // ── Legacy bar chart styles (kept for backward compat) ───────────
     get chartMax() {
         return Math.max(this.laborRevenue, this.productRevenue, this.addonRevenue, this.totalCost, 1);
     }
-
-    get laborCostBarStyle()    { return this.barStyle(this.laborCost);    }
-    get laborMarginBarStyle()  { return this.barStyle(this.laborMargin);  }
-    get productCostBarStyle()  { return this.barStyle(this.productCost);  }
-    get productMarginBarStyle(){ return this.barStyle(this.productMargin);}
-    get addonCostBarStyle()    { return this.barStyle(this.addonCost);    }
-    get addonMarginBarStyle()  { return this.barStyle(this.addonMargin);  }
-
     barStyle(value) {
         const pct = this.chartMax > 0 ? Math.max(0, (value / this.chartMax) * 100) : 0;
         return `height: ${Math.min(pct, 100)}%;`;

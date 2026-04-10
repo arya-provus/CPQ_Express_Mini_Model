@@ -89,6 +89,13 @@
                     </div>
                 </template>
 
+                <!-- Company Info View -->
+                <template if:true={isCompany}>
+                    <div class="section-container">
+                        <c-cpq-company-info></c-cpq-company-info>
+                    </div>
+                </template>
+
                 <template if:true={isUsers}>
                     <div class="section-container">
                         <c-cpq-user-manager></c-cpq-user-manager>
